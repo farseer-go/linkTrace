@@ -32,17 +32,16 @@ func (linkData *linkData) Complete() {
 		linkData.endTime = time.Now()
 		linkData.useTime = linkData.endTime.Unix() - linkData.startTime.Unix()
 		// @todo 根据配置插入es或者数据库等
+		linkTr.chlQueue <- *linkData
 	}
 }
 
 // Create一个请求
-func Create(moduleNmae string, link string, r *http.Request) *linkData {
+func Create(r *http.Request) *linkData {
 	requestId := strconv.Itoa(int(time.Now().Unix())) + strconv.Itoa(rand.Intn(1000000))
 	r.Header.Set("rq_id", requestId)
 	return &linkData{
-		moduleName: moduleNmae,
 		startTime:  time.Now(),
-		link:       link,
 		remoteAddr: getIP(r),
 		userAgent:  r.Header.Get("User-Agent"),
 		requestId:  requestId,

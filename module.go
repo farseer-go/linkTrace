@@ -3,9 +3,16 @@ package linkTrack
 import (
 	"farseer-go/fs/configure"
 	"farseer-go/fs/flog"
+	"github.com/farseer-go/fs/modules"
 )
 
 type Module struct {
+}
+
+var linkTr linkTrack
+
+func (module Module) DependsModule() []modules.FarseerModule {
+	return nil
 }
 
 func (module Module) Initialize() {
@@ -17,9 +24,8 @@ func (module Module) Initialize() {
 			continue
 		}
 	}
+	linkTr.Init()
 }
 
 func (module Module) PreInitialize() {
-	linkTrack := linkTrack{}
-	linkTrack.Init()
 }
