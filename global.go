@@ -1,4 +1,4 @@
-package linkTrack
+package linkTrace
 
 import (
 	"github.com/timandy/routine"
