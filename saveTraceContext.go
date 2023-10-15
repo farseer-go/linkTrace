@@ -9,6 +9,6 @@ import (
 func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListAny, remainingCount int) {
 	lstTraceContext := mapper.ToList[TraceContext](lstMessage)
 	err := ESContext.TraceContext.InsertList(lstTraceContext)
-	_ = flog.Error(err)
+	flog.ErrorIfExists(err)
 	return
 }
