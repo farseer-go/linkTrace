@@ -1,6 +1,9 @@
 package linkTrace
 
-import "github.com/farseer-go/elasticSearch"
+import (
+	"github.com/farseer-go/elasticSearch"
+	"github.com/farseer-go/fs/configure"
+)
 
 var ESContext *esContext
 
@@ -11,5 +14,6 @@ type esContext struct {
 
 // initEsContext 初始化上下文
 func initEsContext() {
+	elasticSearch.RegisterInternalContext("LinkTrace", configure.GetString("LinkTrace.ES"))
 	ESContext = elasticSearch.NewContext[esContext]("LinkTrace")
 }
