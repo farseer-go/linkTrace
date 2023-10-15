@@ -2,6 +2,7 @@ package linkTrace
 
 import (
 	"github.com/farseer-go/elasticSearch"
+	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/modules"
 	"github.com/farseer-go/queue"
 )
@@ -17,7 +18,7 @@ func (module Module) DependsModule() []modules.FarseerModule {
 }
 
 func (module Module) PreInitialize() {
-	Enable = true
+	Enable = configure.GetBool("LinkTrace.Enable")
 }
 
 func (module Module) PostInitialize() {
