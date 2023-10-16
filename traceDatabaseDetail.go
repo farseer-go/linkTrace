@@ -21,7 +21,7 @@ func (receiver *TraceDatabaseDetail) ToString(index int) string {
 	return fmt.Sprintf("%s：[%s]耗时：%s， %s", flog.Blue(index), flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), sql)
 }
 
-func TraceDatabase(dbName, tableName, sql string) *TraceDatabaseDetail {
+func TraceDatabase() *TraceDatabaseDetail {
 	detail := &TraceDatabaseDetail{
 		TraceDetail: TraceDetail{
 			//CallStackTrace: CallStackTrace{},
@@ -29,9 +29,6 @@ func TraceDatabase(dbName, tableName, sql string) *TraceDatabaseDetail {
 			CallType:   eumCallType.Database,
 			StartTs:    time.Now().UnixMicro(),
 		},
-		DbName:    dbName,
-		TableName: tableName,
-		Sql:       sql,
 	}
 
 	if trace := GetCurTrace(); trace != nil && defConfig.Enable {
