@@ -5,12 +5,15 @@ import (
 	"time"
 )
 
+type ITraceDetail interface {
+	ToString(index int) string
+}
+
 // TraceDetail 埋点明细
 type TraceDetail struct {
 	CallStackTrace   CallStackTrace   // 调用栈
 	CallMethod       string           // 调用方法
 	CallType         eumCallType.Enum // 调用类型
-	Data             map[string]any   // 埋点数据
 	StartTs          int64            // 调用开始时间戳
 	EndTs            int64            // 调用停止时间戳
 	UseTs            time.Duration    // 总共使用时间毫秒
@@ -29,6 +32,7 @@ type CallStackTrace struct {
 type ExceptionDetail struct {
 }
 
+// End 链路明细执行完后，统计用时
 func (receiver *TraceDetail) End(err error) {
 	receiver.EndTs = time.Now().UnixMicro()
 	receiver.UseTs = time.Duration(receiver.EndTs-receiver.StartTs) * time.Microsecond
