@@ -8,7 +8,7 @@ import (
 )
 
 // Enable 是否启用
-var Enable bool
+var defConfig config
 
 type Module struct {
 }
@@ -18,7 +18,7 @@ func (module Module) DependsModule() []modules.FarseerModule {
 }
 
 func (module Module) PreInitialize() {
-	Enable = configure.GetBool("LinkTrace.Enable")
+	defConfig = configure.ParseConfig[config]("LinkTrace")
 }
 
 func (module Module) PostInitialize() {
