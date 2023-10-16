@@ -20,10 +20,10 @@ func (receiver *TraceRedisDetail) ToString(index int) string {
 func TraceRedis(redisMethod string, key string, field string) *TraceRedisDetail {
 	detail := &TraceRedisDetail{
 		TraceDetail: TraceDetail{
-			CallStackTrace: CallStackTrace{},
-			CallMethod:     "",
-			CallType:       eumCallType.Redis,
-			StartTs:        time.Now().UnixMicro(),
+			//CallStackTrace: CallStackTrace{},
+			CallMethod: "",
+			CallType:   eumCallType.Redis,
+			StartTs:    time.Now().UnixMicro(),
 		},
 		Key:   key,
 		Field: field,

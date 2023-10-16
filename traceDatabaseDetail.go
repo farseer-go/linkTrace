@@ -17,17 +17,17 @@ type TraceDatabaseDetail struct {
 
 func (receiver *TraceDatabaseDetail) ToString(index int) string {
 	sql := flog.ReplaceBlues(receiver.Sql, "SELECT ", "UPDATE ", "DELETE ", " FROM ", " WHERE ", " LIMIT ", " SET ", " ORDER BY ", " and ", " or ")
-	sql = strings.ReplaceAll(sql, receiver.TableName, flog.Red(receiver.TableName))
-	return fmt.Sprintf("%s：[%s] %s", flog.Blue(index), flog.Yellow(receiver.CallType.ToString()), sql)
+	sql = strings.ReplaceAll(sql, receiver.TableName, flog.Green(receiver.TableName))
+	return fmt.Sprintf("%s：[%s]耗时：%s， %s", flog.Blue(index), flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), sql)
 }
 
 func TraceDatabase(dbName, tableName, sql string) *TraceDatabaseDetail {
 	detail := &TraceDatabaseDetail{
 		TraceDetail: TraceDetail{
-			CallStackTrace: CallStackTrace{},
-			CallMethod:     "",
-			CallType:       eumCallType.Database,
-			StartTs:        time.Now().UnixMicro(),
+			//CallStackTrace: CallStackTrace{},
+			CallMethod: "",
+			CallType:   eumCallType.Database,
+			StartTs:    time.Now().UnixMicro(),
 		},
 		DbName:    dbName,
 		TableName: tableName,

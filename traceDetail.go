@@ -11,7 +11,7 @@ type ITraceDetail interface {
 
 // TraceDetail 埋点明细
 type TraceDetail struct {
-	CallStackTrace   CallStackTrace   // 调用栈
+	//CallStackTrace   CallStackTrace   // 调用栈
 	CallMethod       string           // 调用方法
 	CallType         eumCallType.Enum // 调用类型
 	StartTs          int64            // 调用开始时间戳
