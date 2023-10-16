@@ -21,7 +21,7 @@ func TraceRedis(redisMethod string, key string, field string) *TraceRedisDetail 
 	detail := &TraceRedisDetail{
 		TraceDetail: TraceDetail{
 			//CallStackTrace: CallStackTrace{},
-			CallMethod: "",
+			CallMethod: redisMethod,
 			CallType:   eumCallType.Redis,
 			StartTs:    time.Now().UnixMicro(),
 		},
