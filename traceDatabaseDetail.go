@@ -21,15 +21,10 @@ func (receiver *TraceDatabaseDetail) ToString() string {
 	return fmt.Sprintf("[%s]耗时：%s， %s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), sql)
 }
 
+// TraceDatabase 数据库埋点
 func TraceDatabase() *TraceDatabaseDetail {
 	detail := &TraceDatabaseDetail{
-		TraceDetail: TraceDetail{
-			//CallStackTrace: CallStackTrace{},
-			CallMethod: "",
-			CallType:   eumCallType.Database,
-			StartTs:    time.Now().UnixMicro(),
-			EndTs:      time.Now().UnixMicro(),
-		},
+		TraceDetail: newTraceDetail(eumCallType.Database),
 	}
 
 	if trace := GetCurTrace(); trace != nil && defConfig.Enable {

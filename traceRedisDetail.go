@@ -17,17 +17,12 @@ func (receiver *TraceRedisDetail) ToString() string {
 	return fmt.Sprintf("[%s]耗时：%s，%s Key=%s，FieldKey=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Key, receiver.Field)
 }
 
+// TraceRedis Redis埋点
 func TraceRedis(redisMethod string, key string, field string) *TraceRedisDetail {
 	detail := &TraceRedisDetail{
-		TraceDetail: TraceDetail{
-			//CallStackTrace: CallStackTrace{},
-			CallMethod: redisMethod,
-			CallType:   eumCallType.Redis,
-			StartTs:    time.Now().UnixMicro(),
-			EndTs:      time.Now().UnixMicro(),
-		},
-		Key:   key,
-		Field: field,
+		TraceDetail: newTraceDetail(eumCallType.Redis),
+		Key:         key,
+		Field:       field,
 	}
 
 	if trace := GetCurTrace(); trace != nil && defConfig.Enable {

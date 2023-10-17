@@ -37,6 +37,16 @@ type CallStackTrace struct {
 type ExceptionDetail struct {
 }
 
+func newTraceDetail(callType eumCallType.Enum) TraceDetail {
+	return TraceDetail{
+		//CallStackTrace: CallStackTrace{},
+		CallMethod: "",
+		CallType:   callType,
+		StartTs:    time.Now().UnixMicro(),
+		EndTs:      time.Now().UnixMicro(),
+	}
+}
+
 // End 链路明细执行完后，统计用时
 func (receiver *TraceDetail) End(err error) {
 	receiver.EndTs = time.Now().UnixMicro()
