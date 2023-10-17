@@ -28,6 +28,7 @@ func TraceDatabase() *TraceDatabaseDetail {
 			CallMethod: "",
 			CallType:   eumCallType.Database,
 			StartTs:    time.Now().UnixMicro(),
+			EndTs:      time.Now().UnixMicro(),
 		},
 	}
 

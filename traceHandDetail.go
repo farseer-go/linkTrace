@@ -24,6 +24,7 @@ func TraceHand(name string) *TraceHandDetail {
 			CallMethod: "",
 			CallType:   eumCallType.Hand,
 			StartTs:    time.Now().UnixMicro(),
+			EndTs:      time.Now().UnixMicro(),
 		},
 		Name: name,
 	}

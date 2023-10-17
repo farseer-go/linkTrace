@@ -24,6 +24,7 @@ func TraceRedis(redisMethod string, key string, field string) *TraceRedisDetail 
 			CallMethod: redisMethod,
 			CallType:   eumCallType.Redis,
 			StartTs:    time.Now().UnixMicro(),
+			EndTs:      time.Now().UnixMicro(),
 		},
 		Key:   key,
 		Field: field,
