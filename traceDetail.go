@@ -6,7 +6,10 @@ import (
 )
 
 type ITraceDetail interface {
-	ToString(index int) string
+	ToString() string
+	GetEndTs() int64
+	GetUnTraceTs() time.Duration
+	GetTimeline() time.Duration
 }
 
 // TraceDetail 埋点明细
@@ -14,6 +17,8 @@ type TraceDetail struct {
 	//CallStackTrace   CallStackTrace   // 调用栈
 	CallMethod       string           // 调用方法
 	CallType         eumCallType.Enum // 调用类型
+	Timeline         time.Duration    // 从入口开始统计
+	UnTraceTs        time.Duration    // 上一次结束到现在开始之间未Trace的时间
 	StartTs          int64            // 调用开始时间戳
 	EndTs            int64            // 调用停止时间戳
 	UseTs            time.Duration    // 总共使用时间毫秒
@@ -41,4 +46,16 @@ func (receiver *TraceDetail) End(err error) {
 		receiver.IsException = true
 		receiver.ExceptionMessage = err.Error()
 	}
+}
+
+func (receiver *TraceDetail) GetEndTs() int64 {
+	return receiver.EndTs
+}
+
+func (receiver *TraceDetail) GetUnTraceTs() time.Duration {
+	return receiver.UnTraceTs
+}
+
+func (receiver *TraceDetail) GetTimeline() time.Duration {
+	return receiver.Timeline
 }
