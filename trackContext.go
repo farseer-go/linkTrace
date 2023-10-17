@@ -56,7 +56,7 @@ func (receiver *TraceContext) printLog() {
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
 		for i := 0; i < receiver.List.Count(); i++ {
-			log := fmt.Sprintf("%s(%s)：%s", flog.Blue(i+1), flog.Green(receiver.List.Index(i).GetUnTraceTs().String()), receiver.List.Index(i).ToString())
+			log := fmt.Sprintf("%s(%s)：%s", flog.Blue(i+1), flog.Green(receiver.List.Index(i).GetTraceDetail().UnTraceTs.String()), receiver.List.Index(i).ToString())
 			lst.Add(log)
 		}
 		flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Path, strings.Join(lst.ToArray(), "\n"))

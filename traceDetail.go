@@ -7,9 +7,10 @@ import (
 
 type ITraceDetail interface {
 	ToString() string
-	GetEndTs() int64
-	GetUnTraceTs() time.Duration
-	GetTimeline() time.Duration
+	//GetEndTs() int64
+	//GetUnTraceTs() time.Duration
+	//GetTimeline() time.Duration
+	GetTraceDetail() *TraceDetail
 }
 
 // TraceDetail 埋点明细
@@ -58,14 +59,16 @@ func (receiver *TraceDetail) End(err error) {
 	}
 }
 
-func (receiver *TraceDetail) GetEndTs() int64 {
-	return receiver.EndTs
-}
-
-func (receiver *TraceDetail) GetUnTraceTs() time.Duration {
-	return receiver.UnTraceTs
-}
-
-func (receiver *TraceDetail) GetTimeline() time.Duration {
-	return receiver.Timeline
+func add(traceDetail ITraceDetail) {
+	if trace := GetCurTrace(); trace != nil && defConfig.Enable {
+		detail := traceDetail.GetTraceDetail()
+		// 时间轴：上下文入口起点时间到本次开始时间
+		detail.Timeline = time.Duration(detail.StartTs-trace.StartTs) * time.Microsecond
+		if trace.List.Count() > 0 {
+			detail.UnTraceTs = time.Duration(detail.StartTs-trace.List.Last().GetTraceDetail().EndTs) * time.Microsecond
+		} else {
+			detail.UnTraceTs = time.Duration(detail.StartTs-trace.StartTs) * time.Microsecond
+		}
+		trace.List.Add(traceDetail)
+	}
 }
