@@ -9,7 +9,7 @@ const (
 	Redis                     // Redis
 	Mq                        // Mq
 	Elasticsearch             // Elasticsearch
-	Custom                    // Custom
+	Hand                      // Hand
 	KeyLocation               // KeyLocation
 )
 
@@ -28,8 +28,8 @@ func (receiver Enum) ToString() string {
 	case Elasticsearch:
 		return "Elasticsearch"
 		return "Mq"
-	case Custom:
-		return "Custom"
+	case Hand:
+		return "Hand"
 		return "Mq"
 	case KeyLocation:
 		return "KeyLocation"
