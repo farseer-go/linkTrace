@@ -8,8 +8,8 @@ import (
 
 type TraceDetailEtcd struct {
 	TraceDetail
-	Key   string // redis key
-	Field string // hash field
+	Key     string // key
+	LeaseID int64
 }
 
 func (receiver *TraceDetailEtcd) GetTraceDetail() *TraceDetail {
@@ -17,15 +17,15 @@ func (receiver *TraceDetailEtcd) GetTraceDetail() *TraceDetail {
 }
 
 func (receiver *TraceDetailEtcd) ToString() string {
-	return fmt.Sprintf("[%s]耗时：%s，%s Key=%s，FieldKey=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Key, receiver.Field)
+	return fmt.Sprintf("[%s]耗时：%s，%s Key=%s LeaseID=%v", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Key, receiver.LeaseID)
 }
 
 // TraceEtcd etcd埋点
-func TraceEtcd(redisMethod string, key string, field string) *TraceDetailEtcd {
+func TraceEtcd(redisMethod string, key string, leaseID int64) *TraceDetailEtcd {
 	detail := &TraceDetailEtcd{
-		TraceDetail: newTraceDetail(eumCallType.Mq),
+		TraceDetail: newTraceDetail(eumCallType.Etcd),
 		Key:         key,
-		Field:       field,
+		LeaseID:     leaseID,
 	}
 	add(detail)
 	return detail

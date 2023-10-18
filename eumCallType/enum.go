@@ -3,22 +3,23 @@ package eumCallType
 type Enum int
 
 const (
-	HttpClient    Enum = iota // HttpClient
-	GrpcClient                // GrpcClient
+	Http          Enum = iota // Http
+	Grpc                      // Grpc
 	Database                  // Database
 	Redis                     // Redis
 	Mq                        // Mq
 	Elasticsearch             // Elasticsearch
+	Etcd                      // Elasticsearch
 	Hand                      // Hand
 	KeyLocation               // KeyLocation
 )
 
 func (receiver Enum) ToString() string {
 	switch receiver {
-	case HttpClient:
-		return "HttpClient"
-	case GrpcClient:
-		return "GrpcClient"
+	case Http:
+		return "Http"
+	case Grpc:
+		return "Grpc"
 	case Database:
 		return "Database"
 	case Redis:
@@ -27,12 +28,12 @@ func (receiver Enum) ToString() string {
 		return "Mq"
 	case Elasticsearch:
 		return "Elasticsearch"
-		return "Mq"
 	case Hand:
 		return "Hand"
-		return "Mq"
 	case KeyLocation:
 		return "KeyLocation"
+	case Etcd:
+		return "Etcd"
 	}
 	return ""
 }

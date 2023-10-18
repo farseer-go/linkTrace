@@ -23,7 +23,7 @@ func (receiver *TraceDetailHttp) ToString() string {
 // TraceHttp http埋点
 func TraceHttp(redisMethod string, key string, field string) *TraceDetailHttp {
 	detail := &TraceDetailHttp{
-		TraceDetail: newTraceDetail(eumCallType.Mq),
+		TraceDetail: newTraceDetail(eumCallType.Http),
 		Key:         key,
 		Field:       field,
 	}
