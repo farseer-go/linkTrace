@@ -23,7 +23,7 @@ func (receiver *TraceDetailEs) ToString() string {
 // TraceElasticsearch Elasticsearch埋点
 func TraceElasticsearch(method string, IndexName string, AliasesName string) *TraceDetailEs {
 	detail := &TraceDetailEs{
-		TraceDetail: newTraceDetail(eumCallType.Elasticsearch),
+		TraceDetail: newTraceDetail(eumCallType.Elasticsearch, method),
 		IndexName:   IndexName,
 		AliasesName: AliasesName,
 	}

@@ -21,9 +21,9 @@ func (receiver *TraceDetailEtcd) ToString() string {
 }
 
 // TraceEtcd etcd埋点
-func TraceEtcd(redisMethod string, key string, leaseID int64) *TraceDetailEtcd {
+func TraceEtcd(method string, key string, leaseID int64) *TraceDetailEtcd {
 	detail := &TraceDetailEtcd{
-		TraceDetail: newTraceDetail(eumCallType.Etcd),
+		TraceDetail: newTraceDetail(eumCallType.Etcd, method),
 		Key:         key,
 		LeaseID:     leaseID,
 	}

@@ -21,9 +21,9 @@ func (receiver *TraceDetailRedis) ToString() string {
 }
 
 // TraceRedis Redis埋点
-func TraceRedis(redisMethod string, key string, field string) *TraceDetailRedis {
+func TraceRedis(method string, key string, field string) *TraceDetailRedis {
 	detail := &TraceDetailRedis{
-		TraceDetail: newTraceDetail(eumCallType.Redis),
+		TraceDetail: newTraceDetail(eumCallType.Redis, method),
 		Key:         key,
 		Field:       field,
 	}

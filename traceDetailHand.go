@@ -23,7 +23,7 @@ func (receiver *TraceDetailHand) ToString() string {
 // TraceHand 手动埋点
 func TraceHand(name string) *TraceDetailHand {
 	detail := &TraceDetailHand{
-		TraceDetail: newTraceDetail(eumCallType.Hand),
+		TraceDetail: newTraceDetail(eumCallType.Hand, ""),
 		Name:        name,
 	}
 	add(detail)
@@ -33,7 +33,7 @@ func TraceHand(name string) *TraceDetailHand {
 // TraceKeyLocation 关键位置埋点
 func TraceKeyLocation(name string) *TraceDetailHand {
 	detail := &TraceDetailHand{
-		TraceDetail: newTraceDetail(eumCallType.KeyLocation),
+		TraceDetail: newTraceDetail(eumCallType.KeyLocation, ""),
 		Name:        name,
 	}
 	add(detail)

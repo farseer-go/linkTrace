@@ -38,10 +38,10 @@ type CallStackTrace struct {
 type ExceptionDetail struct {
 }
 
-func newTraceDetail(callType eumCallType.Enum) TraceDetail {
+func newTraceDetail(callType eumCallType.Enum, callMethod string) TraceDetail {
 	return TraceDetail{
 		//CallStackTrace: CallStackTrace{},
-		CallMethod: "",
+		CallMethod: callMethod,
 		CallType:   callType,
 		StartTs:    time.Now().UnixMicro(),
 		EndTs:      time.Now().UnixMicro(),

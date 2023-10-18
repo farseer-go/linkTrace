@@ -8,8 +8,9 @@ import (
 
 type TraceDetailMq struct {
 	TraceDetail
-	Key   string // redis key
-	Field string // hash field
+	Server     string // redis key
+	Exchange   string // hash field
+	RoutingKey string // hash field
 }
 
 func (receiver *TraceDetailMq) GetTraceDetail() *TraceDetail {
@@ -17,15 +18,16 @@ func (receiver *TraceDetailMq) GetTraceDetail() *TraceDetail {
 }
 
 func (receiver *TraceDetailMq) ToString() string {
-	return fmt.Sprintf("[%s]耗时：%s，%s Key=%s，FieldKey=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Key, receiver.Field)
+	return fmt.Sprintf("[%s]耗时：%s，%s Server=%s，Exchange=%s，RoutingKey=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Server, receiver.Exchange, receiver.RoutingKey)
 }
 
 // TraceMq mq send埋点
-func TraceMq(redisMethod string, key string, field string) *TraceDetailMq {
+func TraceMq(method string, server string, exchange string, routingKey string) *TraceDetailMq {
 	detail := &TraceDetailMq{
-		TraceDetail: newTraceDetail(eumCallType.Mq),
-		Key:         key,
-		Field:       field,
+		TraceDetail: newTraceDetail(eumCallType.Mq, method),
+		Server:      server,
+		Exchange:    exchange,
+		RoutingKey:  routingKey,
 	}
 	add(detail)
 	return detail

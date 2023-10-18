@@ -33,7 +33,7 @@ func (receiver *TraceDetailDatabase) ToString() string {
 // TraceDatabase 数据库埋点
 func TraceDatabase() *TraceDetailDatabase {
 	detail := &TraceDetailDatabase{
-		TraceDetail: newTraceDetail(eumCallType.Database),
+		TraceDetail: newTraceDetail(eumCallType.Database, ""),
 	}
 	add(detail)
 	return detail
