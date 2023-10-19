@@ -3,20 +3,20 @@ package linkTrace
 import (
 	"fmt"
 	"github.com/farseer-go/fs/flog"
-	"github.com/farseer-go/linkTrace/eumCallType"
+	"github.com/farseer-go/fs/trace"
 	"strings"
 )
 
 type TraceDetailDatabase struct {
-	TraceDetail
+	trace.BaseTraceDetail
 	DbName           string // 数据库名
 	TableName        string // 表名
 	Sql              string // SQL
 	ConnectionString string // 连接字符串
 }
 
-func (receiver *TraceDetailDatabase) GetTraceDetail() *TraceDetail {
-	return &receiver.TraceDetail
+func (receiver *TraceDetailDatabase) GetTraceDetail() *trace.BaseTraceDetail {
+	return &receiver.BaseTraceDetail
 }
 
 func (receiver *TraceDetailDatabase) ToString() string {
@@ -30,11 +30,8 @@ func (receiver *TraceDetailDatabase) ToString() string {
 	return ""
 }
 
-// TraceDatabase 数据库埋点
-func TraceDatabase() *TraceDetailDatabase {
-	detail := &TraceDetailDatabase{
-		TraceDetail: newTraceDetail(eumCallType.Database, ""),
-	}
-	add(detail)
-	return detail
+func (receiver *TraceDetailDatabase) SetSql(DbName string, tableName string, sql string) {
+	receiver.DbName = DbName
+	receiver.TableName = tableName
+	receiver.Sql = sql
 }

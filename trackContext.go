@@ -3,10 +3,9 @@ package linkTrace
 import (
 	"fmt"
 	"github.com/farseer-go/collections"
-	"github.com/farseer-go/fs"
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/parse"
-	"github.com/farseer-go/fs/snowflake"
+	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumLinkType"
 	"github.com/farseer-go/queue"
 	"strings"
@@ -32,8 +31,22 @@ type TraceContext struct {
 	RequestBody     string                                 `es_type:"text"`      // 请求参数
 	ResponseBody    string                                 `es_type:"text"`      // 输出参数
 	RequestIp       string                                 // 客户端IP
-	List            collections.List[ITraceDetail]         `es_type:"object"` // 调用的上下文
+	List            collections.List[trace.ITraceDetail]   `es_type:"object"` // 调用的上下文
 	ExceptionDetail ExceptionDetail                        `es_type:"object"` // 是否执行异常
+}
+
+func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {
+	receiver.RequestBody = requestBody
+	receiver.StatusCode = statusCode
+	receiver.ResponseBody = responseBody
+}
+
+func (receiver *TraceContext) GetTraceId() int64 {
+	return receiver.TraceId
+}
+
+func (receiver *TraceContext) GetStartTs() int64 {
+	return receiver.StartTs
 }
 
 // End 结束当前链路
@@ -50,6 +63,16 @@ func (receiver *TraceContext) End() {
 	receiver.printLog()
 }
 
+// GetList 获取链路明细
+func (receiver *TraceContext) GetList() collections.List[trace.ITraceDetail] {
+	return receiver.List
+}
+
+// AddDetail 添加链路明细
+func (receiver *TraceContext) AddDetail(detail trace.ITraceDetail) {
+	receiver.List.Add(detail)
+}
+
 // printLog 打印日志
 func (receiver *TraceContext) printLog() {
 	// 打印日志
@@ -61,31 +84,5 @@ func (receiver *TraceContext) printLog() {
 		}
 		flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Path, strings.Join(lst.ToArray(), "\n"))
 		fmt.Println("-----------------------------------------------------------------")
-	}
-}
-
-// TraceWebApi Webapi入口
-func TraceWebApi(domain string, path string, method string, contentType string, headerDictionary collections.ReadonlyDictionary[string, string], requestBody string, requestIp string) *TraceContext {
-	traceId := parse.ToInt64(headerDictionary.GetValue("TraceId"))
-	if traceId == 0 {
-		traceId = snowflake.GenerateId()
-	}
-	return &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
-		ParentAppName: headerDictionary.GetValue("AppName"),
-		TraceId:       traceId,
-		StartTs:       time.Now().UnixMicro(),
-		LinkType:      eumLinkType.WebApi,
-		Domain:        domain,
-		Path:          path,
-		Method:        method,
-		ContentType:   contentType,
-		Headers:       headerDictionary.ToDictionary(),
-		RequestBody:   requestBody,
-		RequestIp:     requestIp,
-		List:          collections.NewList[ITraceDetail](),
-		//ExceptionDetail: ExceptionDetail{},
 	}
 }

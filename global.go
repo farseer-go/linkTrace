@@ -1,18 +1,19 @@
 package linkTrace
 
 import (
+	"github.com/farseer-go/fs/trace"
 	"github.com/timandy/routine"
 )
 
 // CurTraceContext 当前请求的Trace上下文
-var curTraceContext = routine.NewInheritableThreadLocal[*TraceContext]()
+var curTraceContext = routine.NewInheritableThreadLocal[trace.ITraceContext]()
 
-// GetCurTrace 获取当前TrackContext
-func GetCurTrace() *TraceContext {
+// getCurTrace 获取当前TrackContext
+func getCurTrace() trace.ITraceContext {
 	return curTraceContext.Get()
 }
 
-// SetCurTrace 设置当前TrackContext
-func SetCurTrace(context *TraceContext) {
+// setCurTrace 设置当前TrackContext
+func setCurTrace(context trace.ITraceContext) {
 	curTraceContext.Set(context)
 }
