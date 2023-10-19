@@ -27,6 +27,7 @@ type TraceContext struct {
 	ExceptionMessage string                               // 异常信息
 	Web              WebContext
 	Consumer         ConsumerContext
+	Task             TaskContext
 }
 
 type WebContext struct {
@@ -45,6 +46,9 @@ type ConsumerContext struct {
 	Server     string
 	QueueName  string
 	RoutingKey string
+}
+type TaskContext struct {
+	TaskName string
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {

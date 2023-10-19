@@ -43,7 +43,6 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 			RequestIp:   requestIp,
 		},
 		List: collections.NewList[trace.ITraceDetail](),
-		//ExceptionDetail: ExceptionDetail{},
 	}
 	curTraceContext.Set(context)
 	return context
@@ -140,7 +139,6 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 			RoutingKey: routingKey,
 		},
 		List: collections.NewList[trace.ITraceDetail](),
-		//ExceptionDetail: ExceptionDetail{},
 	}
 	curTraceContext.Set(context)
 	return context
@@ -162,7 +160,26 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 			QueueName: subscribeName,
 		},
 		List: collections.NewList[trace.ITraceDetail](),
-		//ExceptionDetail: ExceptionDetail{},
+	}
+	curTraceContext.Set(context)
+	return context
+}
+
+// EntryTask 创建本地任务入口
+func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
+	traceId := snowflake.GenerateId()
+	context := &TraceContext{
+		AppId:         fs.AppId,
+		AppName:       fs.AppName,
+		AppIp:         fs.AppIp,
+		ParentAppName: "",
+		TraceId:       traceId,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.Task,
+		Task: TaskContext{
+			TaskName: taskName,
+		},
+		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
 	return context
