@@ -1,6 +1,7 @@
 package linkTrace
 
 import (
+	"fmt"
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs"
 	"github.com/farseer-go/fs/parse"
@@ -132,11 +133,33 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
-		TraceType:     eumTraceType.Consumer,
+		TraceType:     eumTraceType.MqConsumer,
 		Consumer: ConsumerContext{
 			Server:     server,
 			QueueName:  queueName,
 			RoutingKey: routingKey,
+		},
+		List: collections.NewList[trace.ITraceDetail](),
+		//ExceptionDetail: ExceptionDetail{},
+	}
+	curTraceContext.Set(context)
+	return context
+}
+
+// EntryQueueConsumer queue 消费埋点
+func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContext {
+	traceId := snowflake.GenerateId()
+	context := &TraceContext{
+		AppId:         fs.AppId,
+		AppName:       fs.AppName,
+		AppIp:         fs.AppIp,
+		ParentAppName: "",
+		TraceId:       traceId,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.QueueConsumer,
+		Consumer: ConsumerContext{
+			Server:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
+			QueueName: subscribeName,
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 		//ExceptionDetail: ExceptionDetail{},
