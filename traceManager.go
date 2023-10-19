@@ -15,7 +15,7 @@ type traceManager struct {
 }
 
 func (*traceManager) GetCurTrace() trace.ITraceContext {
-	return getCurTrace()
+	return curTraceContext.Get()
 }
 
 // TraceWebApi Webapi入口
@@ -42,7 +42,7 @@ func (*traceManager) TraceWebApi(domain string, path string, method string, cont
 		List:          collections.NewList[trace.ITraceDetail](),
 		//ExceptionDetail: ExceptionDetail{},
 	}
-	setCurTrace(context)
+	curTraceContext.Set(context)
 	return context
 }
 
@@ -152,7 +152,7 @@ func newTraceDetail(callType eumCallType.Enum, callMethod string) trace.BaseTrac
 }
 
 func add(traceDetail trace.ITraceDetail) {
-	if t := getCurTrace(); t != nil && defConfig.Enable {
+	if t := curTraceContext.Get(); t != nil && defConfig.Enable {
 		detail := traceDetail.GetTraceDetail()
 		// 时间轴：上下文入口起点时间到本次开始时间
 		detail.Timeline = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond

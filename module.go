@@ -23,7 +23,7 @@ func (module Module) PreInitialize() {
 	defConfig = configure.ParseConfig[config]("LinkTrace")
 	// 使用了链路追踪组件，则要把空组件移除后，重新注册
 	container.Remove[trace.IManager]()
-	container.Register[trace.IManager](func() trace.IManager {
+	container.Register(func() trace.IManager {
 		return &traceManager{}
 	})
 }
