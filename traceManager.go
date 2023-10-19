@@ -195,11 +195,31 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
-		TraceType:     eumTraceType.Task,
+		TraceType:     eumTraceType.FSchedule,
 		Task: TaskContext{
 			TaskName:    taskGroupName,
 			TaskGroupId: taskGroupId,
 			TaskId:      taskId,
+		},
+		List: collections.NewList[trace.ITraceDetail](),
+	}
+	curTraceContext.Set(context)
+	return context
+}
+
+// EntryWatchKey 创建etcd入口
+func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
+	traceId := snowflake.GenerateId()
+	context := &TraceContext{
+		AppId:         fs.AppId,
+		AppName:       fs.AppName,
+		AppIp:         fs.AppIp,
+		ParentAppName: "",
+		TraceId:       traceId,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.WatchKey,
+		WatchKey: WatchKeyContext{
+			Key: key,
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}

@@ -28,6 +28,7 @@ type TraceContext struct {
 	Web              WebContext
 	Consumer         ConsumerContext
 	Task             TaskContext
+	WatchKey         WatchKeyContext
 }
 
 type WebContext struct {
@@ -51,6 +52,9 @@ type TaskContext struct {
 	TaskName    string
 	TaskGroupId int64
 	TaskId      int64
+}
+type WatchKeyContext struct {
+	Key string
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {
