@@ -6,39 +6,51 @@ import (
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
-	"github.com/farseer-go/linkTrace/eumLinkType"
+	"github.com/farseer-go/linkTrace/eumTraceType"
 	"github.com/farseer-go/queue"
 	"strings"
 	"time"
 )
 
 type TraceContext struct {
-	TraceId         int64                                  `es:"primaryKey"` // 上下文ID
-	AppId           int64                                  // 应用ID
-	AppName         string                                 // 应用名称
-	AppIp           string                                 // 应用IP
-	ParentAppName   string                                 // 上游应用
-	StartTs         int64                                  // 调用开始时间戳
-	EndTs           int64                                  // 调用结束时间戳
-	UseTs           time.Duration                          // 总共使用时间毫秒
-	LinkType        eumLinkType.Enum                       // 状态码
-	Domain          string                                 // 请求域名
-	Path            string                                 `es_type:"text"` // 请求地址
-	Method          string                                 // 请求方式
-	ContentType     string                                 // 请求内容类型
-	StatusCode      int                                    // 状态码
-	Headers         collections.Dictionary[string, string] `es_type:"flattened"` // 请求头部
-	RequestBody     string                                 `es_type:"text"`      // 请求参数
-	ResponseBody    string                                 `es_type:"text"`      // 输出参数
-	RequestIp       string                                 // 客户端IP
-	List            collections.List[trace.ITraceDetail]   `es_type:"object"` // 调用的上下文
-	ExceptionDetail ExceptionDetail                        `es_type:"object"` // 是否执行异常
+	TraceId          int64                                `es:"primaryKey"` // 上下文ID
+	AppId            int64                                // 应用ID
+	AppName          string                               // 应用名称
+	AppIp            string                               // 应用IP
+	ParentAppName    string                               // 上游应用
+	StartTs          int64                                // 调用开始时间戳
+	EndTs            int64                                // 调用结束时间戳
+	UseTs            time.Duration                        // 总共使用时间毫秒
+	TraceType        eumTraceType.Enum                    // 状态码
+	List             collections.List[trace.ITraceDetail] `es_type:"object"` // 调用的上下文
+	IsException      bool                                 // 是否执行异常
+	ExceptionMessage string                               // 异常信息
+	Web              WebContext
+	Consumer         ConsumerContext
+}
+
+type WebContext struct {
+	Domain       string                                 // 请求域名
+	Path         string                                 `es_type:"text"` // 请求地址
+	Method       string                                 // 请求方式
+	ContentType  string                                 // 请求内容类型
+	StatusCode   int                                    // 状态码
+	Headers      collections.Dictionary[string, string] `es_type:"flattened"` // 请求头部
+	RequestBody  string                                 `es_type:"text"`      // 请求参数
+	ResponseBody string                                 `es_type:"text"`      // 输出参数
+	RequestIp    string                                 // 客户端IP
+}
+
+type ConsumerContext struct {
+	Server     string
+	QueueName  string
+	RoutingKey string
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {
-	receiver.RequestBody = requestBody
-	receiver.StatusCode = statusCode
-	receiver.ResponseBody = responseBody
+	receiver.Web.RequestBody = requestBody
+	receiver.Web.StatusCode = statusCode
+	receiver.Web.ResponseBody = responseBody
 }
 
 func (receiver *TraceContext) GetTraceId() int64 {
@@ -82,7 +94,12 @@ func (receiver *TraceContext) printLog() {
 			log := fmt.Sprintf("%s(%s)：%s", flog.Blue(i+1), flog.Green(receiver.List.Index(i).GetTraceDetail().UnTraceTs.String()), receiver.List.Index(i).ToString())
 			lst.Add(log)
 		}
-		flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Path, strings.Join(lst.ToArray(), "\n"))
+		flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, strings.Join(lst.ToArray(), "\n"))
 		fmt.Println("-----------------------------------------------------------------")
 	}
+}
+
+func (receiver *TraceContext) Error(err error) {
+	receiver.IsException = true
+	receiver.ExceptionMessage = err.Error()
 }

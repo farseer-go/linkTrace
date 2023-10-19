@@ -7,7 +7,7 @@ import (
 	"github.com/farseer-go/fs/snowflake"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumCallType"
-	"github.com/farseer-go/linkTrace/eumLinkType"
+	"github.com/farseer-go/linkTrace/eumTraceType"
 	"time"
 )
 
@@ -18,8 +18,8 @@ func (*traceManager) GetCurTrace() trace.ITraceContext {
 	return curTraceContext.Get()
 }
 
-// TraceWebApi Webapi入口
-func (*traceManager) TraceWebApi(domain string, path string, method string, contentType string, headerDictionary collections.ReadonlyDictionary[string, string], requestBody string, requestIp string) trace.ITraceContext {
+// EntryWebApi Webapi入口
+func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, headerDictionary collections.ReadonlyDictionary[string, string], requestBody string, requestIp string) trace.ITraceContext {
 	traceId := parse.ToInt64(headerDictionary.GetValue("TraceId"))
 	if traceId == 0 {
 		traceId = snowflake.GenerateId()
@@ -31,15 +31,17 @@ func (*traceManager) TraceWebApi(domain string, path string, method string, cont
 		ParentAppName: headerDictionary.GetValue("AppName"),
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
-		LinkType:      eumLinkType.WebApi,
-		Domain:        domain,
-		Path:          path,
-		Method:        method,
-		ContentType:   contentType,
-		Headers:       headerDictionary.ToDictionary(),
-		RequestBody:   requestBody,
-		RequestIp:     requestIp,
-		List:          collections.NewList[trace.ITraceDetail](),
+		TraceType:     eumTraceType.WebApi,
+		Web: WebContext{
+			Domain:      domain,
+			Path:        path,
+			Method:      method,
+			ContentType: contentType,
+			Headers:     headerDictionary.ToDictionary(),
+			RequestBody: requestBody,
+			RequestIp:   requestIp,
+		},
+		List: collections.NewList[trace.ITraceDetail](),
 		//ExceptionDetail: ExceptionDetail{},
 	}
 	curTraceContext.Set(context)
@@ -108,13 +110,47 @@ func (*traceManager) TraceKeyLocation(name string) trace.ITraceDetail {
 	return detail
 }
 
-// TraceMq mq send埋点
-func (*traceManager) TraceMq(method string, server string, exchange string, routingKey string) trace.ITraceDetail {
+// TraceMqSend mq发送埋点
+func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) trace.ITraceDetail {
 	detail := &TraceDetailMq{
 		BaseTraceDetail: newTraceDetail(eumCallType.Mq, method),
 		Server:          server,
 		Exchange:        exchange,
 		RoutingKey:      routingKey,
+	}
+	add(detail)
+	return detail
+}
+
+// EntryMqConsumer mq 消费埋点
+func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey string) trace.ITraceContext {
+	traceId := snowflake.GenerateId()
+	context := &TraceContext{
+		AppId:         fs.AppId,
+		AppName:       fs.AppName,
+		AppIp:         fs.AppIp,
+		ParentAppName: "",
+		TraceId:       traceId,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.Consumer,
+		Consumer: ConsumerContext{
+			Server:     server,
+			QueueName:  queueName,
+			RoutingKey: routingKey,
+		},
+		List: collections.NewList[trace.ITraceDetail](),
+		//ExceptionDetail: ExceptionDetail{},
+	}
+	curTraceContext.Set(context)
+	return context
+}
+
+// TraceMq open、create埋点
+func (*traceManager) TraceMq(method string, server string, exchange string) trace.ITraceDetail {
+	detail := &TraceDetailMq{
+		BaseTraceDetail: newTraceDetail(eumCallType.Mq, method),
+		Server:          server,
+		Exchange:        exchange,
 	}
 	add(detail)
 	return detail

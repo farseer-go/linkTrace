@@ -1,4 +1,4 @@
-package eumLinkType
+package eumTraceType
 
 type Enum int
 
