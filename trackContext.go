@@ -48,7 +48,9 @@ type ConsumerContext struct {
 	RoutingKey string
 }
 type TaskContext struct {
-	TaskName string
+	TaskName    string
+	TaskGroupId int64
+	TaskId      int64
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {

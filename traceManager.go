@@ -185,6 +185,28 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 	return context
 }
 
+// EntryFSchedule 创建调度中心入口
+func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
+	traceId := snowflake.GenerateId()
+	context := &TraceContext{
+		AppId:         fs.AppId,
+		AppName:       fs.AppName,
+		AppIp:         fs.AppIp,
+		ParentAppName: "",
+		TraceId:       traceId,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.Task,
+		Task: TaskContext{
+			TaskName:    taskGroupName,
+			TaskGroupId: taskGroupId,
+			TaskId:      taskId,
+		},
+		List: collections.NewList[trace.ITraceDetail](),
+	}
+	curTraceContext.Set(context)
+	return context
+}
+
 // TraceMq open、create埋点
 func (*traceManager) TraceMq(method string, server string, exchange string) trace.ITraceDetail {
 	detail := &TraceDetailMq{
