@@ -25,6 +25,7 @@ type TraceContext struct {
 	List             collections.List[trace.ITraceDetail] `es_type:"object"` // 调用的上下文
 	IsException      bool                                 // 是否执行异常
 	ExceptionMessage string                               // 异常信息
+	ignore           bool                                 // 忽略这次的链路追踪
 	Web              WebContext
 	Consumer         ConsumerContext
 	Task             TaskContext
@@ -73,9 +74,15 @@ func (receiver *TraceContext) GetStartTs() int64 {
 
 // End 结束当前链路
 func (receiver *TraceContext) End() {
+	if receiver.ignore {
+		return
+	}
 	receiver.EndTs = time.Now().UnixMicro()
 	receiver.UseTs = time.Duration(receiver.EndTs-receiver.StartTs) * time.Microsecond
-
+	// 移除忽略的明细
+	receiver.List.RemoveAll(func(item trace.ITraceDetail) bool {
+		return item.GetTraceDetail().IsIgnore()
+	})
 	// 启用了链路追踪后，把数据写入到本地队列中
 	if defConfig.Enable {
 		queue.Push("TraceContext", *receiver)
@@ -83,6 +90,9 @@ func (receiver *TraceContext) End() {
 
 	// 打印日志
 	receiver.printLog()
+}
+func (receiver *TraceContext) Ignore() {
+	receiver.ignore = true
 }
 
 // GetList 获取链路明细

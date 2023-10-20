@@ -7,6 +7,7 @@ import (
 
 // 写入到ES
 func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListAny, remainingCount int) {
+	curTraceContext.Get().Ignore()
 	lstTraceContext := collections.NewList[TraceContext]()
 	lstMessage.Foreach(func(item *any) {
 		traceContext := *item
