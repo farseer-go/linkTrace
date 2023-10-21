@@ -45,6 +45,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
+	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
 
@@ -141,6 +142,7 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
+	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
 
@@ -162,6 +164,7 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
+	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
 
@@ -182,6 +185,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
+	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
 
@@ -204,6 +208,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
+	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
 
@@ -224,6 +229,7 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 		List: collections.NewList[trace.ITraceDetail](),
 	}
 	curTraceContext.Set(context)
+	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
 
@@ -261,12 +267,23 @@ func (*traceManager) TraceHttp(method string, url string) trace.ITraceDetail {
 }
 
 func newTraceDetail(callType eumCallType.Enum, callMethod string) trace.BaseTraceDetail {
-	return trace.BaseTraceDetail{
-		CallMethod: callMethod,
-		CallType:   callType,
-		StartTs:    time.Now().UnixMicro(),
-		EndTs:      time.Now().UnixMicro(),
+	// 获取当前层级列表
+	lstScope := trace.ScopeLevel.Get()
+	baseTraceDetail := trace.BaseTraceDetail{
+		DetailId:       snowflake.GenerateId(),
+		Level:          lstScope.Count() + 1,
+		ParentDetailId: lstScope.Last().DetailId,
+		CallMethod:     callMethod,
+		CallType:       callType,
+		StartTs:        time.Now().UnixMicro(),
+		EndTs:          time.Now().UnixMicro(),
 	}
+	// 加入到当前层级列表
+	if !lstScope.IsNil() {
+		lstScope.Add(baseTraceDetail)
+		trace.ScopeLevel.Set(lstScope)
+	}
+	return baseTraceDetail
 }
 
 func add(traceDetail trace.ITraceDetail) {
