@@ -112,8 +112,13 @@ func (receiver *TraceContext) printLog() {
 		lst := collections.NewList[string]()
 		for i := 0; i < receiver.List.Count(); i++ {
 			tab := strings.Repeat("\t", receiver.List.Index(i).GetLevel()-1)
-			log := fmt.Sprintf("%s%s(%s)：%s", tab, flog.Blue(i+1), flog.Green(receiver.List.Index(i).GetTraceDetail().UnTraceTs.String()), receiver.List.Index(i).ToString())
+			detail := receiver.List.Index(i).GetTraceDetail()
+			log := fmt.Sprintf("%s%s(%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List.Index(i).ToString())
 			lst.Add(log)
+
+			if detail.IsException {
+				lst.Add(fmt.Sprintf("%s%s:%s\n出错了：%s", detail.CallFile, flog.Red(detail.CallFuncName), flog.Blue(detail.CallLine), flog.Red(detail.ExceptionMessage)))
+			}
 		}
 		flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, strings.Join(lst.ToArray(), "\n"))
 		fmt.Println("-----------------------------------------------------------------")
