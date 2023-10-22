@@ -17,5 +17,5 @@ func (receiver *TraceDetailHttp) GetTraceDetail() *trace.BaseTraceDetail {
 }
 
 func (receiver *TraceDetailHttp) ToString() string {
-	return fmt.Sprintf("[%s]耗时：%s，%s [%s]%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Method, receiver.Url)
+	return fmt.Sprintf("[%s]耗时：%s，%s [%s]%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.MethodName, receiver.Method, receiver.Url)
 }

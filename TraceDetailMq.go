@@ -18,5 +18,5 @@ func (receiver *TraceDetailMq) GetTraceDetail() *trace.BaseTraceDetail {
 }
 
 func (receiver *TraceDetailMq) ToString() string {
-	return fmt.Sprintf("[%s]耗时：%s，%s Server=%s，Exchange=%s，RoutingKey=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.CallMethod, receiver.Server, receiver.Exchange, receiver.RoutingKey)
+	return fmt.Sprintf("[%s]耗时：%s，%s Server=%s，Exchange=%s，RoutingKey=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.MethodName, receiver.Server, receiver.Exchange, receiver.RoutingKey)
 }

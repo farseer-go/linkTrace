@@ -266,14 +266,14 @@ func (*traceManager) TraceHttp(method string, url string) trace.ITraceDetail {
 	return detail
 }
 
-func newTraceDetail(callType eumCallType.Enum, callMethod string) trace.BaseTraceDetail {
+func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTraceDetail {
 	// 获取当前层级列表
 	lstScope := trace.ScopeLevel.Get()
 	baseTraceDetail := trace.BaseTraceDetail{
 		DetailId:       snowflake.GenerateId(),
 		Level:          lstScope.Count() + 1,
 		ParentDetailId: lstScope.Last().DetailId,
-		CallMethod:     callMethod,
+		MethodName:     methodName,
 		CallType:       callType,
 		StartTs:        time.Now().UnixMicro(),
 		EndTs:          time.Now().UnixMicro(),
