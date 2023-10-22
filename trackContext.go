@@ -113,7 +113,7 @@ func (receiver *TraceContext) printLog() {
 		for i := 0; i < receiver.List.Count(); i++ {
 			tab := strings.Repeat("\t", receiver.List.Index(i).GetLevel()-1)
 			detail := receiver.List.Index(i).GetTraceDetail()
-			log := fmt.Sprintf("%s%s(%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List.Index(i).ToString())
+			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List.Index(i).ToString())
 			lst.Add(log)
 
 			if detail.IsException {
