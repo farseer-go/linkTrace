@@ -122,9 +122,9 @@ func (receiver *TraceContext) printLog() {
 		}
 		switch receiver.TraceType {
 		case eumTraceType.WebApi:
-			flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, strings.Join(lst.ToArray(), "\n"))
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, strings.Join(lst.ToArray(), "\n"))
 		default:
-			flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TraceType.ToString(), strings.Join(lst.ToArray(), "\n"))
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s：\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), strings.Join(lst.ToArray(), "\n"))
 		}
 
 		fmt.Println("-----------------------------------------------------------------")
