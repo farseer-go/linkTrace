@@ -120,7 +120,13 @@ func (receiver *TraceContext) printLog() {
 				lst.Add(fmt.Sprintf("%s%s:%s\n出错了：%s", detail.CallFile, flog.Red(detail.CallFuncName), flog.Blue(detail.CallLine), flog.Red(detail.ExceptionMessage)))
 			}
 		}
-		flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, strings.Join(lst.ToArray(), "\n"))
+		switch receiver.TraceType {
+		case eumTraceType.WebApi:
+			flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, strings.Join(lst.ToArray(), "\n"))
+		default:
+			flog.Printf("【链路追踪】TraceId:%s，耗时：%s，%s：\n%s\n", flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TraceType.ToString(), strings.Join(lst.ToArray(), "\n"))
+		}
+
 		fmt.Println("-----------------------------------------------------------------")
 	}
 }

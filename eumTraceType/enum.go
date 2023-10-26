@@ -10,3 +10,21 @@ const (
 	Task                      // 本地任务
 	WatchKey                  // ETCD
 )
+
+func (e Enum) ToString() string {
+	switch e {
+	case WebApi:
+		return "WebApi"
+	case MqConsumer:
+		return "MqConsumer"
+	case QueueConsumer:
+		return "QueueConsumer"
+	case FSchedule:
+		return "FSchedule"
+	case Task:
+		return "Task"
+	case WatchKey:
+		return "WatchKey"
+	}
+	return ""
+}
