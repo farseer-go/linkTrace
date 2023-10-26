@@ -13,23 +13,22 @@ import (
 )
 
 type TraceContext struct {
-	TraceId          int64                                `es:"primaryKey"` // 上下文ID
-	AppId            int64                                // 应用ID
-	AppName          string                               // 应用名称
-	AppIp            string                               // 应用IP
-	ParentAppName    string                               // 上游应用
-	StartTs          int64                                // 调用开始时间戳
-	EndTs            int64                                // 调用结束时间戳
-	UseTs            time.Duration                        // 总共使用时间毫秒
-	TraceType        eumTraceType.Enum                    // 状态码
-	List             collections.List[trace.ITraceDetail] `es_type:"object"` // 调用的上下文
-	IsException      bool                                 // 是否执行异常
-	ExceptionMessage string                               // 异常信息
-	ignore           bool                                 // 忽略这次的链路追踪
-	Web              WebContext
-	Consumer         ConsumerContext
-	Task             TaskContext
-	WatchKey         WatchKeyContext
+	TraceId       int64                                `es:"primaryKey"` // 上下文ID
+	AppId         int64                                // 应用ID
+	AppName       string                               // 应用名称
+	AppIp         string                               // 应用IP
+	ParentAppName string                               // 上游应用
+	StartTs       int64                                // 调用开始时间戳
+	EndTs         int64                                // 调用结束时间戳
+	UseTs         time.Duration                        // 总共使用时间毫秒
+	TraceType     eumTraceType.Enum                    // 状态码
+	List          collections.List[trace.ITraceDetail] `es_type:"object"` // 调用的上下文
+	ignore        bool                                 // 忽略这次的链路追踪
+	Exception     trace.ExceptionStack                 // 异常信息
+	Web           WebContext
+	Consumer      ConsumerContext
+	Task          TaskContext
+	WatchKey      WatchKeyContext
 }
 
 type WebContext struct {
@@ -116,8 +115,8 @@ func (receiver *TraceContext) printLog() {
 			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List.Index(i).ToString())
 			lst.Add(log)
 
-			if detail.IsException {
-				lst.Add(fmt.Sprintf("%s%s:%s\n出错了：%s", detail.CallFile, flog.Red(detail.CallFuncName), flog.Blue(detail.CallLine), flog.Red(detail.ExceptionMessage)))
+			if detail.Exception.IsException {
+				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.CallFile, flog.Blue(detail.Exception.CallLine), flog.Red(detail.Exception.CallFuncName), flog.Red(detail.Exception.ExceptionMessage)))
 			}
 		}
 		switch receiver.TraceType {
@@ -126,12 +125,15 @@ func (receiver *TraceContext) printLog() {
 		default:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s：\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), strings.Join(lst.ToArray(), "\n"))
 		}
-
+		if receiver.Exception.IsException {
+			_ = flog.Errorf(fmt.Sprintf("%s:%s %s %s", receiver.Exception.CallFile, flog.Blue(receiver.Exception.CallLine), flog.Green(receiver.Exception.CallFuncName), flog.Red(receiver.Exception.ExceptionMessage)))
+		}
 		fmt.Println("-----------------------------------------------------------------")
 	}
 }
 
 func (receiver *TraceContext) Error(err error) {
-	receiver.IsException = true
-	receiver.ExceptionMessage = err.Error()
+	receiver.Exception.IsException = true
+	receiver.Exception.ExceptionMessage = err.Error()
+	receiver.Exception.CallFile, receiver.Exception.CallFuncName, receiver.Exception.CallLine = trace.GetCallerInfo()
 }

@@ -16,7 +16,7 @@ type traceManager struct {
 }
 
 func (*traceManager) GetCurTrace() trace.ITraceContext {
-	return curTraceContext.Get()
+	return trace.CurTraceContext.Get()
 }
 
 // EntryWebApi Webapi入口
@@ -44,7 +44,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}
-	curTraceContext.Set(context)
+	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
@@ -141,7 +141,7 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}
-	curTraceContext.Set(context)
+	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
@@ -163,7 +163,7 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}
-	curTraceContext.Set(context)
+	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
@@ -184,7 +184,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}
-	curTraceContext.Set(context)
+	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
@@ -207,7 +207,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}
-	curTraceContext.Set(context)
+	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
@@ -228,7 +228,7 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 		},
 		List: collections.NewList[trace.ITraceDetail](),
 	}
-	curTraceContext.Set(context)
+	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
 	return context
 }
@@ -287,7 +287,7 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 }
 
 func add(traceDetail trace.ITraceDetail) {
-	if t := curTraceContext.Get(); t != nil && defConfig.Enable {
+	if t := trace.CurTraceContext.Get(); t != nil && defConfig.Enable {
 		detail := traceDetail.GetTraceDetail()
 		// 时间轴：上下文入口起点时间到本次开始时间
 		detail.Timeline = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
