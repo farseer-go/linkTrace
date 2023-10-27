@@ -21,7 +21,7 @@ func (receiver *TraceDetailDatabase) GetTraceDetail() *trace.BaseTraceDetail {
 
 func (receiver *TraceDetailDatabase) ToString() string {
 	if receiver.Sql != "" {
-		sql := flog.ReplaceBlues(receiver.Sql, "SELECT ", "UPDATE ", "DELETE ", " FROM ", " WHERE ", " LIMIT ", " SET ", " ORDER BY ", " and ", " or ")
+		sql := flog.ReplaceBlues(receiver.Sql, "SELECT ", "UPDATE ", "DELETE ", "INSERT INTO ", " FROM ", " WHERE ", " LIMIT ", " SET ", " ORDER BY ", " VALUES ", " and ", " or ")
 		sql = strings.ReplaceAll(sql, receiver.TableName, flog.Green(receiver.TableName))
 		return fmt.Sprintf("[%s]耗时：%s， %s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), sql)
 	} else if receiver.ConnectionString != "" {
