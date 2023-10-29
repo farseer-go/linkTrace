@@ -13,6 +13,7 @@ type TraceDetailDatabase struct {
 	TableName        string // 表名
 	Sql              string // SQL
 	ConnectionString string // 连接字符串
+	RowsAffected     int64  // 影响行数
 }
 
 func (receiver *TraceDetailDatabase) GetTraceDetail() *trace.BaseTraceDetail {
@@ -23,15 +24,16 @@ func (receiver *TraceDetailDatabase) ToString() string {
 	if receiver.Sql != "" {
 		sql := flog.ReplaceBlues(receiver.Sql, "SELECT ", "UPDATE ", "DELETE ", "INSERT INTO ", " FROM ", " WHERE ", " LIMIT ", " SET ", " ORDER BY ", " VALUES ", " and ", " or ")
 		sql = strings.ReplaceAll(sql, receiver.TableName, flog.Green(receiver.TableName))
-		return fmt.Sprintf("[%s]耗时：%s， %s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), sql)
+		return fmt.Sprintf("[%s]耗时：%s，[影响%d行]%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.RowsAffected, sql)
 	} else if receiver.ConnectionString != "" {
 		return fmt.Sprintf("[%s]耗时：%s， 连接数据库：%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.ConnectionString)
 	}
 	return ""
 }
 
-func (receiver *TraceDetailDatabase) SetSql(DbName string, tableName string, sql string) {
+func (receiver *TraceDetailDatabase) SetSql(DbName string, tableName string, sql string, rowsAffected int64) {
 	receiver.DbName = DbName
 	receiver.TableName = tableName
 	receiver.Sql = sql
+	receiver.RowsAffected = rowsAffected
 }
