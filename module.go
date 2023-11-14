@@ -29,6 +29,9 @@ func (module Module) PreInitialize() {
 }
 
 func (module Module) PostInitialize() {
-	initEsContext()
-	queue.Subscribe("TraceContext", "SaveTraceContext", 1000, saveTraceContextConsumer)
+	// 启用了链路追踪后，才需要初始化ES和消费
+	if defConfig.Enable {
+		initEsContext()
+		queue.Subscribe("TraceContext", "SaveTraceContext", 1000, saveTraceContextConsumer)
+	}
 }

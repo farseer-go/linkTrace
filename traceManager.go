@@ -287,7 +287,7 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 }
 
 func add(traceDetail trace.ITraceDetail) {
-	if t := trace.CurTraceContext.Get(); t != nil && defConfig.Enable {
+	if t := trace.CurTraceContext.Get(); t != nil {
 		detail := traceDetail.GetTraceDetail()
 		// 时间轴：上下文入口起点时间到本次开始时间
 		detail.Timeline = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
