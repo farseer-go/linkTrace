@@ -7,7 +7,7 @@ import (
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/snowflake"
 	"github.com/farseer-go/fs/trace"
-	"github.com/farseer-go/linkTrace/eumCallType"
+	"github.com/farseer-go/fs/trace/eumCallType"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 	"time"
 )
@@ -20,7 +20,8 @@ func (*traceManager) GetCurTrace() trace.ITraceContext {
 }
 
 // EntryWebApi Webapi入口
-func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, headerDictionary collections.ReadonlyDictionary[string, string], requestBody string, requestIp string) trace.ITraceContext {
+func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestBody string, requestIp string) trace.ITraceContext {
+	headerDictionary := collections.NewDictionaryFromMap(header)
 	traceId := parse.ToInt64(headerDictionary.GetValue("TraceId"))
 	if traceId == 0 {
 		traceId = snowflake.GenerateId()
@@ -42,10 +43,9 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 			RequestBody: requestBody,
 			RequestIp:   requestIp,
 		},
-		List: collections.NewList[trace.ITraceDetail](),
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
 }
 
@@ -139,10 +139,9 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 			QueueName:  queueName,
 			RoutingKey: routingKey,
 		},
-		List: collections.NewList[trace.ITraceDetail](),
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
 }
 
@@ -161,10 +160,9 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 			Server:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
 			QueueName: subscribeName,
 		},
-		List: collections.NewList[trace.ITraceDetail](),
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
 }
 
@@ -182,10 +180,9 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 		Task: TaskContext{
 			TaskName: taskName,
 		},
-		List: collections.NewList[trace.ITraceDetail](),
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
 }
 
@@ -205,10 +202,9 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 			TaskGroupId: taskGroupId,
 			TaskId:      taskId,
 		},
-		List: collections.NewList[trace.ITraceDetail](),
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
 }
 
@@ -226,10 +222,9 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 		WatchKey: WatchKeyContext{
 			Key: key,
 		},
-		List: collections.NewList[trace.ITraceDetail](),
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set(collections.NewList[trace.BaseTraceDetail]())
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
 }
 
@@ -271,18 +266,15 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 	lstScope := trace.ScopeLevel.Get()
 	baseTraceDetail := trace.BaseTraceDetail{
 		DetailId:       snowflake.GenerateId(),
-		Level:          lstScope.Count() + 1,
-		ParentDetailId: lstScope.Last().DetailId,
+		Level:          len(lstScope) + 1,
+		ParentDetailId: lstScope[len(lstScope)-1].DetailId,
 		MethodName:     methodName,
 		CallType:       callType,
 		StartTs:        time.Now().UnixMicro(),
 		EndTs:          time.Now().UnixMicro(),
 	}
 	// 加入到当前层级列表
-	if !lstScope.IsNil() {
-		lstScope.Add(baseTraceDetail)
-		trace.ScopeLevel.Set(lstScope)
-	}
+	trace.ScopeLevel.Set(append(lstScope, baseTraceDetail))
 	return baseTraceDetail
 }
 
@@ -291,8 +283,9 @@ func add(traceDetail trace.ITraceDetail) {
 		detail := traceDetail.GetTraceDetail()
 		// 时间轴：上下文入口起点时间到本次开始时间
 		detail.Timeline = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
-		if t.GetList().Count() > 0 {
-			detail.UnTraceTs = time.Duration(detail.StartTs-t.GetList().Last().GetTraceDetail().EndTs) * time.Microsecond
+		details := t.GetList()
+		if len(details) > 0 {
+			detail.UnTraceTs = time.Duration(detail.StartTs-details[len(details)-1].GetTraceDetail().EndTs) * time.Microsecond
 		} else {
 			detail.UnTraceTs = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
 		}

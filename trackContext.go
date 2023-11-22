@@ -13,18 +13,18 @@ import (
 )
 
 type TraceContext struct {
-	TraceId       int64                                `es:"primaryKey"` // 上下文ID
-	AppId         int64                                // 应用ID
-	AppName       string                               // 应用名称
-	AppIp         string                               // 应用IP
-	ParentAppName string                               // 上游应用
-	StartTs       int64                                // 调用开始时间戳
-	EndTs         int64                                // 调用结束时间戳
-	UseTs         time.Duration                        // 总共使用时间毫秒
-	TraceType     eumTraceType.Enum                    // 状态码
-	List          collections.List[trace.ITraceDetail] `es_type:"object"` // 调用的上下文
-	ignore        bool                                 // 忽略这次的链路追踪
-	Exception     trace.ExceptionStack                 // 异常信息
+	TraceId       int64                `es:"primaryKey"` // 上下文ID
+	AppId         int64                // 应用ID
+	AppName       string               // 应用名称
+	AppIp         string               // 应用IP
+	ParentAppName string               // 上游应用
+	StartTs       int64                // 调用开始时间戳
+	EndTs         int64                // 调用结束时间戳
+	UseTs         time.Duration        // 总共使用时间毫秒
+	TraceType     eumTraceType.Enum    // 状态码
+	List          []trace.ITraceDetail `es_type:"object"` // 调用的上下文
+	ignore        bool                 // 忽略这次的链路追踪
+	Exception     trace.ExceptionStack // 异常信息
 	Web           WebContext
 	Consumer      ConsumerContext
 	Task          TaskContext
@@ -79,9 +79,14 @@ func (receiver *TraceContext) End() {
 	receiver.EndTs = time.Now().UnixMicro()
 	receiver.UseTs = time.Duration(receiver.EndTs-receiver.StartTs) * time.Microsecond
 	// 移除忽略的明细
-	receiver.List.RemoveAll(func(item trace.ITraceDetail) bool {
-		return item.GetTraceDetail().IsIgnore()
-	})
+	var newList []trace.ITraceDetail
+	for _, detail := range receiver.List {
+		if !detail.GetTraceDetail().IsIgnore() {
+			newList = append(newList, detail)
+		}
+	}
+	receiver.List = newList
+
 	// 启用了链路追踪后，把数据写入到本地队列中
 	if defConfig.Enable {
 		queue.Push("TraceContext", *receiver)
@@ -95,13 +100,13 @@ func (receiver *TraceContext) Ignore() {
 }
 
 // GetList 获取链路明细
-func (receiver *TraceContext) GetList() collections.List[trace.ITraceDetail] {
+func (receiver *TraceContext) GetList() []trace.ITraceDetail {
 	return receiver.List
 }
 
 // AddDetail 添加链路明细
 func (receiver *TraceContext) AddDetail(detail trace.ITraceDetail) {
-	receiver.List.Add(detail)
+	receiver.List = append(receiver.List, detail)
 }
 
 // printLog 打印日志
@@ -109,10 +114,10 @@ func (receiver *TraceContext) printLog() {
 	// 打印日志
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
-		for i := 0; i < receiver.List.Count(); i++ {
-			tab := strings.Repeat("\t", receiver.List.Index(i).GetLevel()-1)
-			detail := receiver.List.Index(i).GetTraceDetail()
-			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List.Index(i).ToString())
+		for i := 0; i < len(receiver.List); i++ {
+			tab := strings.Repeat("\t", receiver.List[i].GetLevel()-1)
+			detail := receiver.List[i].GetTraceDetail()
+			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List[i].ToString())
 			lst.Add(log)
 
 			if detail.Exception.IsException {
