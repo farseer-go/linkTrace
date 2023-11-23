@@ -264,10 +264,14 @@ func (*traceManager) TraceHttp(method string, url string) trace.ITraceDetail {
 func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTraceDetail {
 	// 获取当前层级列表
 	lstScope := trace.ScopeLevel.Get()
+	var parentDetailId int64
+	if len(lstScope)>0{
+		parentDetailId=lstScope[len(lstScope)-1].DetailId
+	}
 	baseTraceDetail := trace.BaseTraceDetail{
 		DetailId:       snowflake.GenerateId(),
 		Level:          len(lstScope) + 1,
-		ParentDetailId: lstScope[len(lstScope)-1].DetailId,
+		ParentDetailId: parentDetailId,
 		MethodName:     methodName,
 		CallType:       callType,
 		StartTs:        time.Now().UnixMicro(),
