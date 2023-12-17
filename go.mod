@@ -7,7 +7,7 @@ require (
 	github.com/farseer-go/elasticSearch v0.10.0
 	github.com/farseer-go/fs v0.10.0
 	github.com/farseer-go/mapper v0.10.0
-	github.com/farseer-go/queue v0.9.0
+	github.com/farseer-go/queue v0.10.0
 )
 
 require (
