@@ -43,18 +43,36 @@ type WebContext struct {
 	RequestIp    string                                 // 客户端IP
 }
 
+func (receiver WebContext) IsNil() bool {
+	return receiver.Domain == "" && receiver.Path == "" && receiver.Method == "" && receiver.ContentType == "" && receiver.StatusCode == 0
+}
+
 type ConsumerContext struct {
 	Server     string
 	QueueName  string
 	RoutingKey string
 }
+
+func (receiver ConsumerContext) IsNil() bool {
+	return receiver.Server == "" && receiver.QueueName == "" && receiver.RoutingKey == ""
+}
+
 type TaskContext struct {
 	TaskName    string
 	TaskGroupId int64
 	TaskId      int64
 }
+
+func (receiver TaskContext) IsNil() bool {
+	return receiver.TaskName == "" && receiver.TaskGroupId == 0 && receiver.TaskId == 0
+}
+
 type WatchKeyContext struct {
 	Key string
+}
+
+func (receiver WatchKeyContext) IsNil() bool {
+	return receiver.Key == ""
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {

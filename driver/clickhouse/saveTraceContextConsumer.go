@@ -15,6 +15,18 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	lstMessage.Foreach(func(item *any) {
 		traceContext := (*item).(linkTrace.TraceContext)
 		po := mapper.Single[TraceContextPO](traceContext)
+		if !traceContext.Web.IsNil() {
+			po.Web = &traceContext.Web
+		}
+		if !traceContext.Consumer.IsNil() {
+			po.Consumer = &traceContext.Consumer
+		}
+		if !traceContext.Task.IsNil() {
+			po.Task = &traceContext.Task
+		}
+		if !traceContext.WatchKey.IsNil() {
+			po.WatchKey = &traceContext.WatchKey
+		}
 		lstTraceContext.Add(po)
 	})
 	_, err := CHContext.TraceContext.InsertList(lstTraceContext, 2000)
