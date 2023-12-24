@@ -1,4 +1,4 @@
-package elasticSearch
+package linkTrace_elasticSearch
 
 import (
 	"github.com/farseer-go/elasticSearch"
