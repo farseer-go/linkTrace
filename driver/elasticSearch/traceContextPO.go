@@ -18,7 +18,6 @@ type TraceContextPO struct {
 	UseTs         time.Duration              // 总共使用时间毫秒
 	TraceType     eumTraceType.Enum          // 状态码
 	List          []trace.ITraceDetail       `es_type:"object"` // 调用的上下文
-	ignore        bool                       // 忽略这次的链路追踪
 	Exception     *trace.ExceptionStack      `es_type:"object"` // 异常信息
 	Web           *linkTrace.WebContext      `es_type:"object"` // Web请求上下文
 	Consumer      *linkTrace.ConsumerContext `es_type:"object"` // 消费上下文

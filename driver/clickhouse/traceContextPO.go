@@ -17,7 +17,6 @@ type TraceContextPO struct {
 	EndTs         int64                      `gorm:"not null;default:0;comment:调用结束时间戳"`
 	UseTs         time.Duration              `gorm:"not null;default:0;comment:总共使用时间毫秒"`
 	TraceType     eumTraceType.Enum          `gorm:"not null;comment:状态码"`
-	ignore        bool                       `gorm:"not null;default:false;comment:忽略这次的链路追踪"`
 	Exception     *trace.ExceptionStack      `gorm:"json;not null;comment:异常信息"`
 	List          []trace.ITraceDetail       `gorm:"json;not null;comment:调用的上下文"`
 	Web           *linkTrace.WebContext      `gorm:"json;not null;comment:Web请求上下文"`

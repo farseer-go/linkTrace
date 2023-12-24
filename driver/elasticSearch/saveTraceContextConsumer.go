@@ -13,6 +13,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	trace.CurTraceContext.Get().Ignore()
 	lstTraceContext := collections.NewList[TraceContextPO]()
 	lstMessage.Foreach(func(item *any) {
+		// 上下文
 		traceContext := (*item).(linkTrace.TraceContext)
 		po := mapper.Single[TraceContextPO](traceContext)
 		if !traceContext.Web.IsNil() {
