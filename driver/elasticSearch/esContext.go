@@ -10,7 +10,7 @@ var ESContext *esContext
 
 // EsContext 链路追踪上下文
 type esContext struct {
-	TraceContext elasticSearch.IndexSet[linkTrace.TraceContext] `es:"index=linktrace_yyyy_MM;alias=linktrace;shards=1;replicas=0;refresh=3"`
+	TraceContext elasticSearch.IndexSet[linkTrace.TraceContext] `es:"index=link_trace_yyyy_MM;alias=link_trace;shards=1;replicas=0;refresh=3"`
 }
 
 // initEsContext 初始化上下文

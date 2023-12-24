@@ -14,7 +14,6 @@ type chContext struct {
 
 // initCHContext 初始化上下文
 func initCHContext() {
-	connectionString := configure.GetString("LinkTrace.CH")
-	data.RegisterInternalContext("LinkTrace", connectionString)
+	data.RegisterInternalContext("LinkTrace", configure.GetString("LinkTrace.CH"))
 	CHContext = data.NewContext[chContext]("LinkTrace")
 }
