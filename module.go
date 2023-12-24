@@ -1,7 +1,6 @@
 package linkTrace
 
 import (
-	"github.com/farseer-go/elasticSearch"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/modules"
@@ -16,7 +15,7 @@ type Module struct {
 }
 
 func (module Module) DependsModule() []modules.FarseerModule {
-	return []modules.FarseerModule{queue.Module{}, elasticSearch.Module{}}
+	return []modules.FarseerModule{queue.Module{}}
 }
 
 func (module Module) PreInitialize() {
@@ -26,12 +25,4 @@ func (module Module) PreInitialize() {
 	container.Register(func() trace.IManager {
 		return &traceManager{}
 	})
-}
-
-func (module Module) PostInitialize() {
-	// 启用了链路追踪后，才需要初始化ES和消费
-	if defConfig.Enable {
-		initEsContext()
-		queue.Subscribe("TraceContext", "SaveTraceContext", 1000, saveTraceContextConsumer)
-	}
 }
