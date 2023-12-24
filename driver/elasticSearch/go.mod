@@ -3,9 +3,20 @@ module github.com/farseer-go/linkTrace/driver/elasticSearch
 go 1.19
 
 require (
+	github.com/farseer-go/collections v0.10.0
 	github.com/farseer-go/elasticSearch v0.10.0
+	github.com/farseer-go/fs v0.10.0
 	github.com/farseer-go/linkTrace v0.10.0
+	github.com/farseer-go/queue v0.10.0
 )
 
 require (
+	github.com/josharian/intern v1.0.0 // indirect
+	github.com/kr/text v0.2.0 // indirect
+	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/olivere/elastic/v7 v7.0.32 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rogpeppe/go-internal v1.12.0 // indirect
+	github.com/timandy/routine v1.1.2 // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

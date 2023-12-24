@@ -1,7 +1,7 @@
 package linkTrace_clickhouse
 
 import (
-	data_clickhouse "github.com/farseer-go/data/driver/lickhouse"
+	"github.com/farseer-go/data/driver/clickhouse"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/modules"
 	"github.com/farseer-go/linkTrace"
