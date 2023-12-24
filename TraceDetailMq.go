@@ -8,9 +8,9 @@ import (
 
 type TraceDetailMq struct {
 	trace.BaseTraceDetail
-	Server     string // redis key
-	Exchange   string // hash field
-	RoutingKey string // hash field
+	Server     string // MQ服务器地址
+	Exchange   string // 交换器名称
+	RoutingKey string // 路由key
 }
 
 func (receiver *TraceDetailMq) GetTraceDetail() *trace.BaseTraceDetail {
