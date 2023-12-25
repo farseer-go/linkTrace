@@ -35,7 +35,8 @@ func (receiver *TraceDetailDatabase) ToString() string {
 	return ""
 }
 
-func (receiver *TraceDetailDatabase) SetSql(DbName string, tableName string, sql string, rowsAffected int64) {
+func (receiver *TraceDetailDatabase) SetSql(connectionString string, DbName string, tableName string, sql string, rowsAffected int64) {
+	receiver.ConnectionString = connectionString
 	receiver.DbName = DbName
 	receiver.TableName = tableName
 	receiver.Sql = sql
