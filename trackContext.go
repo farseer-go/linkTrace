@@ -163,7 +163,9 @@ func (receiver *TraceContext) printLog() {
 }
 
 func (receiver *TraceContext) Error(err error) {
-	receiver.Exception.IsException = true
-	receiver.Exception.ExceptionMessage = err.Error()
-	receiver.Exception.CallFile, receiver.Exception.CallFuncName, receiver.Exception.CallLine = trace.GetCallerInfo()
+	if err != nil {
+		receiver.Exception.IsException = true
+		receiver.Exception.ExceptionMessage = err.Error()
+		receiver.Exception.CallFile, receiver.Exception.CallFuncName, receiver.Exception.CallLine = trace.GetCallerInfo()
+	}
 }
