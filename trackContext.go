@@ -18,9 +18,9 @@ type TraceContext struct {
 	AppName       string               // 应用名称
 	AppIp         string               // 应用IP
 	ParentAppName string               // 上游应用
-	StartTs       int64                // 调用开始时间戳
+	StartTs       int64                // 调用开始时间戳（微秒）
 	EndTs         int64                // 调用结束时间戳
-	UseTs         time.Duration        // 总共使用时间毫秒
+	UseTs         time.Duration        // 总共使用时间微秒
 	TraceType     eumTraceType.Enum    // 状态码
 	List          []trace.ITraceDetail `es_type:"object"` // 调用的上下文
 	ignore        bool                 // 忽略这次的链路追踪

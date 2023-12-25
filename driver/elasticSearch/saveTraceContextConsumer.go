@@ -36,28 +36,74 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 		if !traceContext.WatchKey.IsNil() {
 			po.WatchKey = &traceContext.WatchKey
 		}
+		if !traceContext.Exception.IsNil() {
+			po.Exception = &traceContext.Exception
+		}
 		lstTraceContext.Add(po)
 
 		// 明细
 		for _, detail := range traceContext.List {
 			switch detailType := detail.(type) {
 			case *linkTrace.TraceDetailDatabase:
-				lstTraceDetailDatabase.Add(mapper.Single[TraceDetailDatabasePO](*detailType))
+				databasePO := mapper.Single[TraceDetailDatabasePO](*detailType)
+				databasePO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &databasePO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					databasePO.Exception = &detailType.Exception
+				}
+				lstTraceDetailDatabase.Add(databasePO)
 			case *linkTrace.TraceDetailEs:
-				lstTraceDetailEs.Add(mapper.Single[TraceDetailEsPO](*detailType))
+				esPO := mapper.Single[TraceDetailEsPO](*detailType)
+				esPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &esPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					esPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailEs.Add(esPO)
 			case *linkTrace.TraceDetailEtcd:
-				lstTraceDetailEtcd.Add(mapper.Single[TraceDetailEtcdPO](*detailType))
+				etcdPO := mapper.Single[TraceDetailEtcdPO](*detailType)
+				etcdPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &etcdPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					etcdPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailEtcd.Add(etcdPO)
 			case *linkTrace.TraceDetailHand:
-				lstTraceDetailHand.Add(mapper.Single[TraceDetailHandPO](*detailType))
+				handPO := mapper.Single[TraceDetailHandPO](*detailType)
+				handPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &handPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					handPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailHand.Add(handPO)
 			case *linkTrace.TraceDetailHttp:
-				lstTraceDetailHttp.Add(mapper.Single[TraceDetailHttpPO](*detailType))
+				httpPO := mapper.Single[TraceDetailHttpPO](*detailType)
+				httpPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &httpPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					httpPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailHttp.Add(httpPO)
 			case *linkTrace.TraceDetailMq:
-				lstTraceDetailMq.Add(mapper.Single[TraceDetailMqPO](*detailType))
+				mqPO := mapper.Single[TraceDetailMqPO](*detailType)
+				mqPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &mqPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					mqPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailMq.Add(mqPO)
 			case *linkTrace.TraceDetailRedis:
-				lstTraceDetailRedis.Add(mapper.Single[TraceDetailRedisPO](*detailType))
+				redisPO := mapper.Single[TraceDetailRedisPO](*detailType)
+				redisPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &redisPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					redisPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailRedis.Add(redisPO)
 			}
 		}
 	})
+	// 写入上下文
 	err := ESContext.TraceContext.InsertList(lstTraceContext)
 	flog.ErrorIfExists(err)
 

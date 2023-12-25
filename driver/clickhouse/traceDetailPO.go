@@ -7,62 +7,62 @@ import (
 )
 
 type BaseTraceDetailPO struct {
-	TraceId        int64                `gorm:"not null;default:0;comment:上下文ID"`
-	AppId          int64                `gorm:"not null;default:0;comment:应用ID"`
-	AppName        string               `gorm:"not null;default:'';comment:应用名称"`
-	AppIp          string               `gorm:"not null;default:'';comment:应用IP"`
-	ParentAppName  string               `gorm:"not null;default:'';comment:上游应用"`
-	DetailId       int64                `gorm:"not null;default:0;comment:明细ID"`
-	ParentDetailId int64                `gorm:"not null;default:0;comment:父级明细ID"`
-	Level          int                  `gorm:"not null;comment:当前层级（入口为0层）"`
-	MethodName     string               `gorm:"not null;default:'';comment:调用方法"`
-	CallType       eumCallType.Enum     `gorm:"not null;comment:调用类型"`
-	Timeline       time.Duration        `gorm:"not null;default:0;comment:从入口开始统计"`
-	UnTraceTs      time.Duration        `gorm:"not null;default:0;comment:上一次结束到现在开始之间未Trace的时间"`
-	StartTs        int64                `gorm:"not null;default:0;comment:调用开始时间戳"`
-	EndTs          int64                `gorm:"not null;default:0;comment:调用停止时间戳"`
-	UseTs          time.Duration        `gorm:"not null;default:0;comment:总共使用时间毫秒"`
-	Exception      trace.ExceptionStack `gorm:"json;not null;comment:异常信息"`
+	TraceId        int64                 `gorm:"not null;default:0;comment:上下文ID"`
+	AppId          int64                 `gorm:"not null;default:0;comment:应用ID"`
+	AppName        string                `gorm:"not null;default:'';comment:应用名称"`
+	AppIp          string                `gorm:"not null;default:'';comment:应用IP"`
+	ParentAppName  string                `gorm:"not null;default:'';comment:上游应用"`
+	DetailId       int64                 `gorm:"not null;default:0;comment:明细ID"`
+	ParentDetailId int64                 `gorm:"not null;default:0;comment:父级明细ID"`
+	Level          int                   `gorm:"not null;comment:当前层级（入口为0层）"`
+	MethodName     string                `gorm:"not null;default:'';comment:调用方法"`
+	CallType       eumCallType.Enum      `gorm:"not null;comment:调用类型"`
+	Timeline       time.Duration         `gorm:"not null;default:0;comment:从入口开始统计（微秒）"`
+	UnTraceTs      time.Duration         `gorm:"not null;default:0;comment:上一次结束到现在开始之间未Trace的时间（微秒）"`
+	StartTs        int64                 `gorm:"not null;default:0;comment:调用开始时间戳（微秒）"`
+	EndTs          int64                 `gorm:"not null;default:0;comment:调用停止时间戳（微秒）"`
+	UseTs          time.Duration         `gorm:"not null;default:0;comment:总共使用时间微秒"`
+	Exception      *trace.ExceptionStack `gorm:"json;not null;comment:异常信息"`
 }
 
 type TraceDetailDatabasePO struct {
-	BaseTraceDetailPO
-	DbName           string `gorm:"not null;default:'';comment:数据库名"`
-	TableName        string `gorm:"not null;default:'';comment:表名"`
-	Sql              string `gorm:"not null;default:'';comment:SQL"`
-	ConnectionString string `gorm:"not null;default:'';comment:连接字符串"`
-	RowsAffected     int64  `gorm:"not null;default:0;comment:影响行数"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	DbName            string `gorm:"not null;default:'';comment:数据库名"`
+	TableName         string `gorm:"not null;default:'';comment:表名"`
+	Sql               string `gorm:"not null;default:'';comment:SQL"`
+	ConnectionString  string `gorm:"not null;default:'';comment:连接字符串"`
+	RowsAffected      int64  `gorm:"not null;default:0;comment:影响行数"`
 }
 
 type TraceDetailEsPO struct {
-	trace.BaseTraceDetail
-	IndexName   string `gorm:"not null;default:'';comment:索引名称"`
-	AliasesName string `gorm:"not null;default:'';comment:别名"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	IndexName         string `gorm:"not null;default:'';comment:索引名称"`
+	AliasesName       string `gorm:"not null;default:'';comment:别名"`
 }
 type TraceDetailEtcdPO struct {
-	trace.BaseTraceDetail
-	Key     string `gorm:"not null;default:'';comment:etcd key"`
-	LeaseID int64  `gorm:"not null;default:0;comment:LeaseID"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	Key               string `gorm:"not null;default:'';comment:etcd key"`
+	LeaseID           int64  `gorm:"not null;default:0;comment:LeaseID"`
 }
 
 // TraceDetailHandPO 手动埋点
 type TraceDetailHandPO struct {
-	trace.BaseTraceDetail
-	Name string `gorm:"not null;default:'';comment:名称"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	Name              string `gorm:"not null;default:'';comment:名称"`
 }
 type TraceDetailHttpPO struct {
-	trace.BaseTraceDetail
-	Method string `gorm:"not null;default:'';comment:post/get/put/delete"`
-	Url    string `gorm:"not null;default:'';comment:请求url"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	Method            string `gorm:"not null;default:'';comment:post/get/put/delete"`
+	Url               string `gorm:"not null;default:'';comment:请求url"`
 }
 type TraceDetailMqPO struct {
-	trace.BaseTraceDetail
-	Server     string `gorm:"not null;default:'';comment:MQ服务器地址"`
-	Exchange   string `gorm:"not null;default:'';comment:交换器名称"`
-	RoutingKey string `gorm:"not null;default:'';comment:路由key"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	Server            string `gorm:"not null;default:'';comment:MQ服务器地址"`
+	Exchange          string `gorm:"not null;default:'';comment:交换器名称"`
+	RoutingKey        string `gorm:"not null;default:'';comment:路由key"`
 }
 type TraceDetailRedisPO struct {
-	trace.BaseTraceDetail
-	Key   string `gorm:"not null;default:'';comment:redis key"`
-	Field string `gorm:"not null;default:'';comment:hash field"`
+	BaseTraceDetailPO `gorm:"embedded"`
+	Key               string `gorm:"not null;default:'';comment:redis key"`
+	Field             string `gorm:"not null;default:'';comment:hash field"`
 }

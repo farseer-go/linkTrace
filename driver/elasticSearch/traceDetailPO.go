@@ -7,22 +7,22 @@ import (
 )
 
 type BaseTraceDetailPO struct {
-	TraceId        int64                // 上下文ID
-	AppId          int64                // 应用ID
-	AppName        string               // 应用名称
-	AppIp          string               // 应用IP
-	ParentAppName  string               // 上游应用
-	DetailId       int64                `es:"primaryKey"`
-	ParentDetailId int64                // 父级明细ID
-	Level          int                  // 当前层级（入口为0层）
-	MethodName     string               // 调用方法
-	CallType       eumCallType.Enum     // 调用类型
-	Timeline       time.Duration        // 从入口开始统计
-	UnTraceTs      time.Duration        // 上一次结束到现在开始之间未Trace的时间
-	StartTs        int64                // 调用开始时间戳
-	EndTs          int64                // 调用停止时间戳
-	UseTs          time.Duration        // 总共使用时间毫秒
-	Exception      trace.ExceptionStack `es_type:"object"` // 异常信息
+	TraceId        int64                 // 上下文ID
+	AppId          int64                 // 应用ID
+	AppName        string                // 应用名称
+	AppIp          string                // 应用IP
+	ParentAppName  string                // 上游应用
+	DetailId       int64                 `es:"primaryKey"`
+	ParentDetailId int64                 // 父级明细ID
+	Level          int                   // 当前层级（入口为0层）
+	MethodName     string                // 调用方法
+	CallType       eumCallType.Enum      // 调用类型
+	Timeline       time.Duration         // 从入口开始统计（微秒）
+	UnTraceTs      time.Duration         // 上一次结束到现在开始之间未Trace的时间（微秒）
+	StartTs        int64                 // 调用开始时间戳（微秒）
+	EndTs          int64                 // 调用停止时间戳（微秒）
+	UseTs          time.Duration         // 总共使用时间微秒
+	Exception      *trace.ExceptionStack `es_type:"object"` // 异常信息
 }
 
 type TraceDetailDatabasePO struct {
@@ -35,34 +35,34 @@ type TraceDetailDatabasePO struct {
 }
 
 type TraceDetailEsPO struct {
-	trace.BaseTraceDetail
+	BaseTraceDetailPO
 	IndexName   string // 索引名称
 	AliasesName string // 别名
 }
 type TraceDetailEtcdPO struct {
-	trace.BaseTraceDetail
+	BaseTraceDetailPO
 	Key     string // etcd key
 	LeaseID int64  // LeaseID
 }
 
 // TraceDetailHandPO 手动埋点
 type TraceDetailHandPO struct {
-	trace.BaseTraceDetail
+	BaseTraceDetailPO
 	Name string // 名称
 }
 type TraceDetailHttpPO struct {
-	trace.BaseTraceDetail
+	BaseTraceDetailPO
 	Method string // post/get/put/delete
 	Url    string // 请求url
 }
 type TraceDetailMqPO struct {
-	trace.BaseTraceDetail
+	BaseTraceDetailPO
 	Server     string // MQ服务器地址
 	Exchange   string // 交换器名称
 	RoutingKey string // 路由key
 }
 type TraceDetailRedisPO struct {
-	trace.BaseTraceDetail
+	BaseTraceDetailPO
 	Key   string // redis key
 	Field string // hash field
 }
