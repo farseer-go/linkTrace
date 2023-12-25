@@ -22,7 +22,7 @@ func (*traceManager) GetCurTrace() trace.ITraceContext {
 // EntryWebApi Webapi入口
 func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestBody string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
-	traceId := parse.ToInt64(headerDictionary.GetValue("TraceId"))
+	traceId := parse.ToInt64(headerDictionary.GetValue("Trace-Id"))
 	if traceId == 0 {
 		traceId = snowflake.GenerateId()
 	}
@@ -30,7 +30,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		AppId:         fs.AppId,
 		AppName:       fs.AppName,
 		AppIp:         fs.AppIp,
-		ParentAppName: headerDictionary.GetValue("AppName"),
+		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
@@ -265,8 +265,8 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 	// 获取当前层级列表
 	lstScope := trace.ScopeLevel.Get()
 	var parentDetailId int64
-	if len(lstScope)>0{
-		parentDetailId=lstScope[len(lstScope)-1].DetailId
+	if len(lstScope) > 0 {
+		parentDetailId = lstScope[len(lstScope)-1].DetailId
 	}
 	baseTraceDetail := trace.BaseTraceDetail{
 		DetailId:       snowflake.GenerateId(),
