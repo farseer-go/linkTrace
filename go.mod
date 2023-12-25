@@ -3,9 +3,9 @@ module github.com/farseer-go/linkTrace
 go 1.19
 
 require (
-	github.com/farseer-go/collections v0.10.0
-	github.com/farseer-go/fs v0.10.0
-	github.com/farseer-go/queue v0.10.0
+	github.com/farseer-go/collections v0.11.0
+	github.com/farseer-go/fs v0.11.0
+	github.com/farseer-go/queue v0.11.0
 )
 
 require (
