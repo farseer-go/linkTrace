@@ -37,9 +37,9 @@ type WebContext struct {
 	Method       string                                 // 请求方式
 	ContentType  string                                 // 请求内容类型
 	StatusCode   int                                    // 状态码
-	Headers      collections.Dictionary[string, string] `es_type:"flattened"` // 请求头部
-	RequestBody  string                                 `es_type:"text"`      // 请求参数
-	ResponseBody string                                 `es_type:"text"`      // 输出参数
+	Headers      collections.Dictionary[string, string] `es_type:"flattened" gorm:"json;not null;comment:请求头部"`
+	RequestBody  string                                 `es_type:"text"` // 请求参数
+	ResponseBody string                                 `es_type:"text"` // 输出参数
 	RequestIp    string                                 // 客户端IP
 }
 

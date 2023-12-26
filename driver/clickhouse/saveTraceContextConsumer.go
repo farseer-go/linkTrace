@@ -24,20 +24,9 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 		// 上下文
 		traceContext := (*item).(linkTrace.TraceContext)
 		po := mapper.Single[TraceContextPO](traceContext)
-		if !traceContext.Web.IsNil() {
-			po.Web = &traceContext.Web
-		}
-		if !traceContext.Consumer.IsNil() {
-			po.Consumer = &traceContext.Consumer
-		}
-		if !traceContext.Task.IsNil() {
-			po.Task = &traceContext.Task
-		}
-		if !traceContext.WatchKey.IsNil() {
-			po.WatchKey = &traceContext.WatchKey
-		}
 		if !traceContext.Exception.IsNil() {
-			po.Exception = &traceContext.Exception
+			exceptionStackPO := mapper.Single[ExceptionStackPO](traceContext.Exception)
+			po.Exception = &exceptionStackPO
 		}
 		lstTraceContext.Add(po)
 
