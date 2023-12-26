@@ -19,7 +19,7 @@ type TraceContext struct {
 	AppIp         string               // 应用IP
 	ParentAppName string               // 上游应用
 	StartTs       int64                // 调用开始时间戳（微秒）
-	EndTs         int64                // 调用结束时间戳
+	EndTs         int64                // 调用结束时间戳（微秒）
 	UseTs         time.Duration        // 总共使用时间微秒
 	TraceType     eumTraceType.Enum    // 状态码
 	List          []trace.ITraceDetail `es_type:"object"` // 调用的上下文
@@ -32,29 +32,29 @@ type TraceContext struct {
 }
 
 type WebContext struct {
-	Domain       string                                 // 请求域名
-	Path         string                                 `es_type:"text"` // 请求地址
-	Method       string                                 // 请求方式
-	ContentType  string                                 // 请求内容类型
-	StatusCode   int                                    // 状态码
-	Headers      collections.Dictionary[string, string] `es_type:"flattened" gorm:"json;not null;comment:请求头部"`
-	RequestBody  string                                 `es_type:"text"` // 请求参数
-	ResponseBody string                                 `es_type:"text"` // 输出参数
-	RequestIp    string                                 // 客户端IP
+	WebDomain       string                                 // 请求域名
+	WebPath         string                                 `es_type:"text"` // 请求地址
+	WebMethod       string                                 // 请求方式
+	WebContentType  string                                 // 请求内容类型
+	WebStatusCode   int                                    // 状态码
+	WebHeaders      collections.Dictionary[string, string] `es_type:"flattened" gorm:"json;not null;comment:请求头部"`
+	WebRequestBody  string                                 `es_type:"text"` // 请求参数
+	WebResponseBody string                                 `es_type:"text"` // 输出参数
+	WebRequestIp    string                                 // 客户端IP
 }
 
 func (receiver WebContext) IsNil() bool {
-	return receiver.Domain == "" && receiver.Path == "" && receiver.Method == "" && receiver.ContentType == "" && receiver.StatusCode == 0
+	return receiver.WebDomain == "" && receiver.WebPath == "" && receiver.WebMethod == "" && receiver.WebContentType == "" && receiver.WebStatusCode == 0
 }
 
 type ConsumerContext struct {
-	Server     string
-	QueueName  string
-	RoutingKey string
+	ConsumerServer     string
+	ConsumerQueueName  string
+	ConsumerRoutingKey string
 }
 
 func (receiver ConsumerContext) IsNil() bool {
-	return receiver.Server == "" && receiver.QueueName == "" && receiver.RoutingKey == ""
+	return receiver.ConsumerServer == "" && receiver.ConsumerQueueName == "" && receiver.ConsumerRoutingKey == ""
 }
 
 type TaskContext struct {
@@ -68,17 +68,17 @@ func (receiver TaskContext) IsNil() bool {
 }
 
 type WatchKeyContext struct {
-	Key string
+	WatchKey string
 }
 
 func (receiver WatchKeyContext) IsNil() bool {
-	return receiver.Key == ""
+	return receiver.WatchKey == ""
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {
-	receiver.Web.RequestBody = requestBody
-	receiver.Web.StatusCode = statusCode
-	receiver.Web.ResponseBody = responseBody
+	receiver.Web.WebRequestBody = requestBody
+	receiver.Web.WebStatusCode = statusCode
+	receiver.Web.WebResponseBody = responseBody
 }
 
 func (receiver *TraceContext) GetTraceId() int64 {
@@ -138,22 +138,22 @@ func (receiver *TraceContext) printLog() {
 			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List[i].ToString())
 			lst.Add(log)
 
-			if detail.Exception.IsException {
-				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.CallFile, flog.Blue(detail.Exception.CallLine), flog.Red(detail.Exception.CallFuncName), flog.Red(detail.Exception.ExceptionMessage)))
+			if detail.Exception.ExceptionIsException {
+				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.ExceptionCallFile, flog.Blue(detail.Exception.ExceptionCallLine), flog.Red(detail.Exception.ExceptionCallFuncName), flog.Red(detail.Exception.ExceptionMessage)))
 			}
 		}
 
-		if receiver.Exception.IsException {
-			lst.Add(fmt.Sprintf("%s%s:%s %s %s", flog.Red("【异常】"), flog.Blue(receiver.Exception.CallFile), flog.Blue(receiver.Exception.CallLine), flog.Green(receiver.Exception.CallFuncName), flog.Red(receiver.Exception.ExceptionMessage)))
+		if receiver.Exception.ExceptionIsException {
+			lst.Add(fmt.Sprintf("%s%s:%s %s %s", flog.Red("【异常】"), flog.Blue(receiver.Exception.ExceptionCallFile), flog.Blue(receiver.Exception.ExceptionCallLine), flog.Green(receiver.Exception.ExceptionCallFuncName), flog.Red(receiver.Exception.ExceptionMessage)))
 		}
 
 		lst.Add("-----------------------------------------------------------------")
 		logs := strings.Join(lst.ToArray(), "\n")
 		switch receiver.TraceType {
 		case eumTraceType.WebApi:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.Path, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.WebPath, logs)
 		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Consumer.QueueName, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Consumer.ConsumerQueueName, logs)
 		case eumTraceType.Task, eumTraceType.FSchedule:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Task.TaskName, logs)
 		default:
@@ -164,8 +164,8 @@ func (receiver *TraceContext) printLog() {
 
 func (receiver *TraceContext) Error(err error) {
 	if err != nil {
-		receiver.Exception.IsException = true
+		receiver.Exception.ExceptionIsException = true
 		receiver.Exception.ExceptionMessage = err.Error()
-		receiver.Exception.CallFile, receiver.Exception.CallFuncName, receiver.Exception.CallLine = trace.GetCallerInfo()
+		receiver.Exception.ExceptionCallFile, receiver.Exception.ExceptionCallFuncName, receiver.Exception.ExceptionCallLine = trace.GetCallerInfo()
 	}
 }

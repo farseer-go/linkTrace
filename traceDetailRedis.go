@@ -17,5 +17,5 @@ func (receiver *TraceDetailRedis) GetTraceDetail() *trace.BaseTraceDetail {
 }
 
 func (receiver *TraceDetailRedis) ToString() string {
-	return fmt.Sprintf("[%s]耗时：%s，%s Key=%s，Field=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.MethodName, receiver.Key, receiver.Field)
+	return fmt.Sprintf("[%s]耗时：%s，%s WatchKey=%s，Field=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.MethodName, receiver.Key, receiver.Field)
 }

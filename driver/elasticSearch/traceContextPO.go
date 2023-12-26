@@ -26,21 +26,21 @@ type TraceContextPO struct {
 }
 
 type WebContextPO struct {
-	Domain       string                                 // 请求域名
-	Path         string                                 `es_type:"text"` // 请求地址
-	Method       string                                 // 请求方式
-	ContentType  string                                 // 请求内容类型
-	StatusCode   int                                    // 状态码
-	Headers      collections.Dictionary[string, string] `es_type:"flattened"` // 请求头部
-	RequestBody  string                                 `es_type:"text"`      // 请求参数
-	ResponseBody string                                 `es_type:"text"`      // 输出参数
-	RequestIp    string                                 // 客户端IP
+	WebDomain       string                                 // 请求域名
+	WebPath         string                                 `es_type:"text"` // 请求地址
+	WebMethod       string                                 // 请求方式
+	WebContentType  string                                 // 请求内容类型
+	WebStatusCode   int                                    // 状态码
+	WebHeaders      collections.Dictionary[string, string] `es_type:"flattened"` // 请求头部
+	WebRequestBody  string                                 `es_type:"text"`      // 请求参数
+	WebResponseBody string                                 `es_type:"text"`      // 输出参数
+	WebRequestIp    string                                 // 客户端IP
 }
 
 type ConsumerContextPO struct {
-	Server     string
-	QueueName  string
-	RoutingKey string
+	ConsumerServer     string
+	ConsumerQueueName  string
+	ConsumerRoutingKey string
 }
 
 type TaskContextPO struct {
@@ -50,13 +50,13 @@ type TaskContextPO struct {
 }
 
 type WatchKeyContextPO struct {
-	Key string
+	WatchKey string
 }
 
 type ExceptionStackPO struct {
-	CallFile         string // 调用者文件路径
-	CallLine         int    // 调用者行号
-	CallFuncName     string // 调用者函数名称
-	IsException      bool   // 是否执行异常
-	ExceptionMessage string // 异常信息
+	ExceptionCallFile     string // 调用者文件路径
+	ExceptionCallLine     int    // 调用者行号
+	ExceptionCallFuncName string // 调用者函数名称
+	ExceptionIsException  bool   // 是否执行异常
+	ExceptionMessage      string // 异常信息
 }

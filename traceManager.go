@@ -35,13 +35,13 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
 		Web: WebContext{
-			Domain:      domain,
-			Path:        path,
-			Method:      method,
-			ContentType: contentType,
-			Headers:     headerDictionary.ToDictionary(),
-			RequestBody: requestBody,
-			RequestIp:   requestIp,
+			WebDomain:      domain,
+			WebPath:        path,
+			WebMethod:      method,
+			WebContentType: contentType,
+			WebHeaders:     headerDictionary.ToDictionary(),
+			WebRequestBody: requestBody,
+			WebRequestIp:   requestIp,
 		},
 	}
 	trace.CurTraceContext.Set(context)
@@ -135,9 +135,9 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
 		Consumer: ConsumerContext{
-			Server:     server,
-			QueueName:  queueName,
-			RoutingKey: routingKey,
+			ConsumerServer:     server,
+			ConsumerQueueName:  queueName,
+			ConsumerRoutingKey: routingKey,
 		},
 	}
 	trace.CurTraceContext.Set(context)
@@ -157,8 +157,8 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		Consumer: ConsumerContext{
-			Server:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
-			QueueName: subscribeName,
+			ConsumerServer:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
+			ConsumerQueueName: subscribeName,
 		},
 	}
 	trace.CurTraceContext.Set(context)
@@ -220,7 +220,7 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WatchKey,
 		WatchKey: WatchKeyContext{
-			Key: key,
+			WatchKey: key,
 		},
 	}
 	trace.CurTraceContext.Set(context)
