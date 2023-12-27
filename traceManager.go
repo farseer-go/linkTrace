@@ -34,7 +34,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
-		Web: WebContext{
+		WebContext: WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
 			WebMethod:      method,
@@ -134,7 +134,7 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
-		Consumer: ConsumerContext{
+		ConsumerContext: ConsumerContext{
 			ConsumerServer:     server,
 			ConsumerQueueName:  queueName,
 			ConsumerRoutingKey: routingKey,
@@ -156,7 +156,7 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
-		Consumer: ConsumerContext{
+		ConsumerContext: ConsumerContext{
 			ConsumerServer:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
 			ConsumerQueueName: subscribeName,
 		},
@@ -177,7 +177,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
-		Task: TaskContext{
+		TaskContext: TaskContext{
 			TaskName: taskName,
 		},
 	}
@@ -197,7 +197,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.FSchedule,
-		Task: TaskContext{
+		TaskContext: TaskContext{
 			TaskName:    taskGroupName,
 			TaskGroupId: taskGroupId,
 			TaskId:      taskId,
@@ -219,7 +219,7 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WatchKey,
-		WatchKey: WatchKeyContext{
+		WatchKeyContext: WatchKeyContext{
 			WatchKey: key,
 		},
 	}

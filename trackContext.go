@@ -13,7 +13,7 @@ import (
 )
 
 type TraceContext struct {
-	TraceId       int64                `es:"primaryKey"` // 上下文ID
+	TraceId       int64                // 上下文ID
 	AppId         int64                // 应用ID
 	AppName       string               // 应用名称
 	AppIp         string               // 应用IP
@@ -22,24 +22,24 @@ type TraceContext struct {
 	EndTs         int64                // 调用结束时间戳（微秒）
 	UseTs         time.Duration        // 总共使用时间微秒
 	TraceType     eumTraceType.Enum    // 状态码
-	List          []trace.ITraceDetail `es_type:"object"` // 调用的上下文
+	List          []trace.ITraceDetail // 调用的上下文
 	ignore        bool                 // 忽略这次的链路追踪
 	Exception     trace.ExceptionStack // 异常信息
-	Web           WebContext
-	Consumer      ConsumerContext
-	Task          TaskContext
-	WatchKey      WatchKeyContext
+	WebContext
+	ConsumerContext
+	TaskContext
+	WatchKeyContext
 }
 
 type WebContext struct {
 	WebDomain       string                                 // 请求域名
-	WebPath         string                                 `es_type:"text"` // 请求地址
+	WebPath         string                                 // 请求地址
 	WebMethod       string                                 // 请求方式
 	WebContentType  string                                 // 请求内容类型
 	WebStatusCode   int                                    // 状态码
-	WebHeaders      collections.Dictionary[string, string] `es_type:"flattened" gorm:"json;not null;comment:请求头部"`
-	WebRequestBody  string                                 `es_type:"text"` // 请求参数
-	WebResponseBody string                                 `es_type:"text"` // 输出参数
+	WebHeaders      collections.Dictionary[string, string] // 请求头部
+	WebRequestBody  string                                 // 请求参数
+	WebResponseBody string                                 // 输出参数
 	WebRequestIp    string                                 // 客户端IP
 }
 
@@ -76,9 +76,9 @@ func (receiver WatchKeyContext) IsNil() bool {
 }
 
 func (receiver *TraceContext) SetBody(requestBody string, statusCode int, responseBody string) {
-	receiver.Web.WebRequestBody = requestBody
-	receiver.Web.WebStatusCode = statusCode
-	receiver.Web.WebResponseBody = responseBody
+	receiver.WebContext.WebRequestBody = requestBody
+	receiver.WebContext.WebStatusCode = statusCode
+	receiver.WebContext.WebResponseBody = responseBody
 }
 
 func (receiver *TraceContext) GetTraceId() int64 {
@@ -151,11 +151,11 @@ func (receiver *TraceContext) printLog() {
 		logs := strings.Join(lst.ToArray(), "\n")
 		switch receiver.TraceType {
 		case eumTraceType.WebApi:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Web.WebPath, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.WebContext.WebPath, logs)
 		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Consumer.ConsumerQueueName, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.ConsumerContext.ConsumerQueueName, logs)
 		case eumTraceType.Task, eumTraceType.FSchedule:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.Task.TaskName, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TaskContext.TaskName, logs)
 		default:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), logs)
 		}
