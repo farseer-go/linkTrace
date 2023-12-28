@@ -1,6 +1,7 @@
 package linkTrace_clickhouse
 
 import (
+	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/fs/trace/eumCallType"
 	"time"
@@ -52,8 +53,12 @@ type TraceDetailHandPO struct {
 }
 type TraceDetailHttpPO struct {
 	BaseTraceDetailPO `gorm:"embedded"`
-	Method            string `gorm:"not null;default:'';comment:post/get/put/delete"`
-	Url               string `gorm:"not null;default:'';comment:请求url"`
+	Method            string                                 `gorm:"not null;default:'';comment:post/get/put/delete"`
+	Url               string                                 `gorm:"not null;default:'';comment:请求url"`
+	Headers           collections.Dictionary[string, string] `gorm:"type:String;json;not null;comment:请求头部"`
+	RequestBody       string                                 `gorm:"not null;default:'';comment:入参"`
+	ResponseBody      string                                 `gorm:"not null;default:'';comment:出参"`
+	StatusCode        int                                    `gorm:"not null;default:0;comment:状态码"`
 }
 type TraceDetailMqPO struct {
 	BaseTraceDetailPO `gorm:"embedded"`
