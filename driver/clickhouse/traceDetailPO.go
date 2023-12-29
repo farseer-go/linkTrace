@@ -22,6 +22,7 @@ type BaseTraceDetailPO struct {
 	StartTs        int64                 `gorm:"not null;default:0;comment:调用开始时间戳（微秒）"`
 	EndTs          int64                 `gorm:"not null;default:0;comment:调用停止时间戳（微秒）"`
 	UseTs          time.Duration         `gorm:"not null;default:0;comment:总共使用时间微秒"`
+	UseDesc        string                `gorm:"-"`
 	Exception      *trace.ExceptionStack `gorm:"json;not null;comment:异常信息"`
 	MethodName     string                `gorm:"not null;default:'';comment:调用方法"`
 }

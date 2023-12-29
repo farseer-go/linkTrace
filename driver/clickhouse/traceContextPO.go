@@ -15,6 +15,7 @@ type TraceContextPO struct {
 	StartTs           int64             `gorm:"not null;default:0;comment:调用开始时间戳（微秒）"`
 	EndTs             int64             `gorm:"not null;default:0;comment:调用结束时间戳"`
 	UseTs             time.Duration     `gorm:"not null;default:0;comment:总共使用时间微秒"`
+	UseDesc           string            `gorm:"-"`
 	TraceType         eumTraceType.Enum `gorm:"not null;comment:入口类型"`
 	Exception         *ExceptionStackPO `gorm:"json;not null;comment:异常信息"`
 	List              []any             `gorm:"json;not null;comment:调用的上下文"`
