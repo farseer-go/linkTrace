@@ -2,23 +2,22 @@ package linkTrace_clickhouse
 
 import (
 	"github.com/farseer-go/collections"
-	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 	"time"
 )
 
 type TraceContextPO struct {
-	TraceId           int64                `gorm:"not null;default:0;comment:上下文ID"`
-	AppId             int64                `gorm:"not null;default:0;comment:应用ID"`
-	AppName           string               `gorm:"not null;default:'';comment:应用名称"`
-	AppIp             string               `gorm:"not null;default:'';comment:应用IP"`
-	ParentAppName     string               `gorm:"not null;default:'';comment:上游应用"`
-	StartTs           int64                `gorm:"not null;default:0;comment:调用开始时间戳（微秒）"`
-	EndTs             int64                `gorm:"not null;default:0;comment:调用结束时间戳"`
-	UseTs             time.Duration        `gorm:"not null;default:0;comment:总共使用时间微秒"`
-	TraceType         eumTraceType.Enum    `gorm:"not null;comment:状态码"`
-	Exception         *ExceptionStackPO    `gorm:"json;not null;comment:异常信息"`
-	List              []trace.ITraceDetail `gorm:"json;not null;comment:调用的上下文"`
+	TraceId           int64             `gorm:"not null;default:0;comment:上下文ID"`
+	AppId             int64             `gorm:"not null;default:0;comment:应用ID"`
+	AppName           string            `gorm:"not null;default:'';comment:应用名称"`
+	AppIp             string            `gorm:"not null;default:'';comment:应用IP"`
+	ParentAppName     string            `gorm:"not null;default:'';comment:上游应用"`
+	StartTs           int64             `gorm:"not null;default:0;comment:调用开始时间戳（微秒）"`
+	EndTs             int64             `gorm:"not null;default:0;comment:调用结束时间戳"`
+	UseTs             time.Duration     `gorm:"not null;default:0;comment:总共使用时间微秒"`
+	TraceType         eumTraceType.Enum `gorm:"not null;comment:入口类型"`
+	Exception         *ExceptionStackPO `gorm:"json;not null;comment:异常信息"`
+	List              []any             `gorm:"json;not null;comment:调用的上下文"`
 	WebContextPO      `gorm:"embedded;not null;comment:Web请求上下文"`
 	ConsumerContextPO `gorm:"embedded;not null;comment:消费上下文"`
 	TaskContextPO     `gorm:"embedded;not null;comment:任务上下文"`

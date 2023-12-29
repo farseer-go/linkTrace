@@ -24,11 +24,6 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 		// 上下文
 		traceContext := (*item).(linkTrace.TraceContext)
 		po := mapper.Single[TraceContextPO](traceContext)
-		// mapper组件不支持嵌入类型转换，先手动处理。
-		//po.WebContextPO = mapper.Single[WebContextPO](traceContext.WebContext)
-		//po.TaskContextPO = mapper.Single[TaskContextPO](traceContext.TaskContext)
-		//po.ConsumerContextPO = mapper.Single[ConsumerContextPO](traceContext.ConsumerContext)
-		//po.WatchKeyContextPO = mapper.Single[WatchKeyContextPO](traceContext.WatchKey)
 		if !traceContext.Exception.IsNil() {
 			exceptionStackPO := mapper.Single[ExceptionStackPO](traceContext.Exception)
 			po.Exception = &exceptionStackPO
