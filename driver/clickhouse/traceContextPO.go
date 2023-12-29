@@ -2,6 +2,7 @@ package linkTrace_clickhouse
 
 import (
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 	"time"
 )
@@ -23,7 +24,7 @@ type TraceContextPO struct {
 	ConsumerContextPO `gorm:"embedded;not null;comment:消费上下文"`
 	TaskContextPO     `gorm:"embedded;not null;comment:任务上下文"`
 	WatchKeyContextPO `gorm:"embedded;not null;comment:Etcd上下文"`
-	CreateAt          time.Time `gorm:"type:DateTime64(3);not null;comment:请求时间"`
+	CreateAt          dateTime.DateTime `gorm:"type:DateTime64(3);not null;comment:请求时间"`
 }
 
 type WebContextPO struct {

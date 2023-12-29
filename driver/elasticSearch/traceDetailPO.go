@@ -2,6 +2,7 @@ package linkTrace_elasticSearch
 
 import (
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/fs/trace/eumCallType"
 	"time"
@@ -25,7 +26,7 @@ type BaseTraceDetailPO struct {
 	UseTs          time.Duration         // 总共使用时间微秒
 	UseDesc        string                // 总共使用时间（描述）
 	Exception      *trace.ExceptionStack `es_type:"object"` // 异常信息
-	CreateAt       time.Time             // 请求时间
+	CreateAt       dateTime.DateTime     // 请求时间
 }
 
 type TraceDetailDatabasePO struct {

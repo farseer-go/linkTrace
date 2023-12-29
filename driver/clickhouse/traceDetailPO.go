@@ -2,6 +2,7 @@ package linkTrace_clickhouse
 
 import (
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/fs/trace/eumCallType"
 	"time"
@@ -25,7 +26,7 @@ type BaseTraceDetailPO struct {
 	UseDesc        string                `gorm:"not null;default:'';comment:总共使用时间（描述）"`
 	Exception      *trace.ExceptionStack `gorm:"json;not null;comment:异常信息"`
 	MethodName     string                `gorm:"not null;default:'';comment:调用方法"`
-	CreateAt       time.Time             `gorm:"type:DateTime64(3);not null;comment:请求时间"`
+	CreateAt       dateTime.DateTime     `gorm:"type:DateTime64(3);not null;comment:请求时间"`
 }
 
 type TraceDetailDatabasePO struct {

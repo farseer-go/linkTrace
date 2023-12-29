@@ -2,11 +2,11 @@ package linkTrace_clickhouse
 
 import (
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace"
 	"github.com/farseer-go/mapper"
-	"time"
 )
 
 // 写入到clickhouse
@@ -31,7 +31,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 			po.Exception = &exceptionStackPO
 		}
 		po.UseDesc = po.UseTs.String()
-		po.CreateAt = time.UnixMicro(po.StartTs)
+		po.CreateAt = dateTime.NewUnixMilli(po.StartTs)
 		lstTraceContext.Add(po)
 
 		// 明细
@@ -45,7 +45,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					databasePO.Exception = &detailType.Exception
 				}
 				databasePO.UseDesc = databasePO.UseTs.String()
-				databasePO.CreateAt = time.UnixMicro(databasePO.StartTs)
+				databasePO.CreateAt = dateTime.NewUnixMilli(databasePO.StartTs)
 				lstTraceDetailDatabase.Add(databasePO)
 			case *linkTrace.TraceDetailEs:
 				esPO := mapper.Single[TraceDetailEsPO](*detailType)
@@ -55,7 +55,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					esPO.Exception = &detailType.Exception
 				}
 				esPO.UseDesc = esPO.UseTs.String()
-				esPO.CreateAt = time.UnixMicro(esPO.StartTs)
+				esPO.CreateAt = dateTime.NewUnixMilli(esPO.StartTs)
 				lstTraceDetailEs.Add(esPO)
 			case *linkTrace.TraceDetailEtcd:
 				etcdPO := mapper.Single[TraceDetailEtcdPO](*detailType)
@@ -65,7 +65,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					etcdPO.Exception = &detailType.Exception
 				}
 				etcdPO.UseDesc = etcdPO.UseTs.String()
-				etcdPO.CreateAt = time.UnixMicro(etcdPO.StartTs)
+				etcdPO.CreateAt = dateTime.NewUnixMilli(etcdPO.StartTs)
 				lstTraceDetailEtcd.Add(etcdPO)
 			case *linkTrace.TraceDetailHand:
 				handPO := mapper.Single[TraceDetailHandPO](*detailType)
@@ -75,7 +75,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					handPO.Exception = &detailType.Exception
 				}
 				handPO.UseDesc = handPO.UseTs.String()
-				handPO.CreateAt = time.UnixMicro(handPO.StartTs)
+				handPO.CreateAt = dateTime.NewUnixMilli(handPO.StartTs)
 				lstTraceDetailHand.Add(handPO)
 			case *linkTrace.TraceDetailHttp:
 				httpPO := mapper.Single[TraceDetailHttpPO](*detailType)
@@ -85,7 +85,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					httpPO.Exception = &detailType.Exception
 				}
 				httpPO.UseDesc = httpPO.UseTs.String()
-				httpPO.CreateAt = time.UnixMicro(httpPO.StartTs)
+				httpPO.CreateAt = dateTime.NewUnixMilli(httpPO.StartTs)
 				lstTraceDetailHttp.Add(httpPO)
 			case *linkTrace.TraceDetailGrpc:
 				grpcPO := mapper.Single[TraceDetailGrpcPO](*detailType)
@@ -95,7 +95,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					grpcPO.Exception = &detailType.Exception
 				}
 				grpcPO.UseDesc = grpcPO.UseTs.String()
-				grpcPO.CreateAt = time.UnixMicro(grpcPO.StartTs)
+				grpcPO.CreateAt = dateTime.NewUnixMilli(grpcPO.StartTs)
 				lstTraceDetailGrpc.Add(grpcPO)
 			case *linkTrace.TraceDetailMq:
 				mqPO := mapper.Single[TraceDetailMqPO](*detailType)
@@ -105,7 +105,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					mqPO.Exception = &detailType.Exception
 				}
 				mqPO.UseDesc = mqPO.UseTs.String()
-				mqPO.CreateAt = time.UnixMicro(mqPO.StartTs)
+				mqPO.CreateAt = dateTime.NewUnixMilli(mqPO.StartTs)
 				lstTraceDetailMq.Add(mqPO)
 			case *linkTrace.TraceDetailRedis:
 				redisPO := mapper.Single[TraceDetailRedisPO](*detailType)
@@ -115,7 +115,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					redisPO.Exception = &detailType.Exception
 				}
 				redisPO.UseDesc = redisPO.UseTs.String()
-				redisPO.CreateAt = time.UnixMicro(redisPO.StartTs)
+				redisPO.CreateAt = dateTime.NewUnixMilli(redisPO.StartTs)
 				lstTraceDetailRedis.Add(redisPO)
 			}
 		}

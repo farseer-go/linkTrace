@@ -2,6 +2,7 @@ package linkTrace_elasticSearch
 
 import (
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 	"time"
@@ -24,7 +25,7 @@ type TraceContextPO struct {
 	Consumer      ConsumerContextPO    `es_type:"object"` // 消费上下文
 	Task          TaskContextPO        `es_type:"object"` // 任务上下文
 	WatchKey      WatchKeyContextPO    `es_type:"object"` // Etcd上下文
-	CreateAt      time.Time            // 请求时间
+	CreateAt      dateTime.DateTime    // 请求时间
 }
 
 type WebContextPO struct {
