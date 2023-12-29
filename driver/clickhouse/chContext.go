@@ -15,6 +15,7 @@ type chContext struct {
 	TraceDetailEtcd     data.TableSet[TraceDetailEtcdPO]     `data:"name=trace_detail_etcd;migrate=ReplacingMergeTree() ORDER BY (app_name,parent_app_name,app_ip,app_id,trace_id,key) PARTITION BY app_name"`
 	TraceDetailHand     data.TableSet[TraceDetailHandPO]     `data:"name=trace_detail_hand;migrate=ReplacingMergeTree() ORDER BY (app_name,parent_app_name,app_ip,app_id,trace_id,name) PARTITION BY app_name"`
 	TraceDetailHttp     data.TableSet[TraceDetailHttpPO]     `data:"name=trace_detail_http;migrate=ReplacingMergeTree() ORDER BY (app_name,parent_app_name,app_ip,app_id,trace_id,method,url) PARTITION BY app_name"`
+	TraceDetailGrpc     data.TableSet[TraceDetailGrpcPO]     `data:"name=trace_detail_grpc;migrate=ReplacingMergeTree() ORDER BY (app_name,parent_app_name,app_ip,app_id,trace_id,method,url) PARTITION BY app_name"`
 	TraceDetailMq       data.TableSet[TraceDetailMqPO]       `data:"name=trace_detail_mq;migrate=ReplacingMergeTree() ORDER BY (app_name,parent_app_name,app_ip,app_id,trace_id,server,exchange,routing_key) PARTITION BY app_name"`
 	TraceDetailRedis    data.TableSet[TraceDetailRedisPO]    `data:"name=trace_detail_redis;migrate=ReplacingMergeTree() ORDER BY (app_name,parent_app_name,app_ip,app_id,trace_id,key,field) PARTITION BY app_name"`
 }

@@ -60,6 +60,15 @@ type TraceDetailHttpPO struct {
 	ResponseBody string                                 // 出参
 	StatusCode   int                                    // 状态码
 }
+type TraceDetailGrpcPO struct {
+	BaseTraceDetailPO
+	Method       string                                 // post/get/put/delete
+	Url          string                                 // 请求url
+	Headers      collections.Dictionary[string, string] `es_type:"flattened"` // 请求头部
+	RequestBody  string                                 // 入参
+	ResponseBody string                                 // 出参
+	StatusCode   int                                    // 状态码
+}
 type TraceDetailMqPO struct {
 	BaseTraceDetailPO
 	Server     string // MQ服务器地址

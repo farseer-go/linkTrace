@@ -186,7 +186,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 	return context
 }
 
-// EntryTask 创建本地任务入口（调度中心专用）
+// EntryTaskGroup 创建本地任务入口（调度中心专用）
 func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
@@ -276,6 +276,17 @@ func (*traceManager) TraceRedis(method string, key string, field string) trace.I
 func (*traceManager) TraceHttp(method string, url string) trace.ITraceDetail {
 	detail := &TraceDetailHttp{
 		BaseTraceDetail: newTraceDetail(eumCallType.Http, method),
+		Method:          method,
+		Url:             url,
+	}
+	add(detail)
+	return detail
+}
+
+// TraceGrpc grpc埋点
+func (*traceManager) TraceGrpc(method string, url string) trace.ITraceDetail {
+	detail := &TraceDetailGrpc{
+		BaseTraceDetail: newTraceDetail(eumCallType.Grpc, method),
 		Method:          method,
 		Url:             url,
 	}

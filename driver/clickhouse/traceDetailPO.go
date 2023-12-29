@@ -16,7 +16,6 @@ type BaseTraceDetailPO struct {
 	DetailId       int64                 `gorm:"not null;default:0;comment:明细ID"`
 	ParentDetailId int64                 `gorm:"not null;default:0;comment:父级明细ID"`
 	Level          int                   `gorm:"not null;comment:当前层级（入口为0层）"`
-	MethodName     string                `gorm:"not null;default:'';comment:调用方法"`
 	CallType       eumCallType.Enum      `gorm:"not null;comment:调用类型"`
 	Timeline       time.Duration         `gorm:"not null;default:0;comment:从入口开始统计（微秒）"`
 	UnTraceTs      time.Duration         `gorm:"not null;default:0;comment:上一次结束到现在开始之间未Trace的时间（微秒）"`
@@ -24,6 +23,7 @@ type BaseTraceDetailPO struct {
 	EndTs          int64                 `gorm:"not null;default:0;comment:调用停止时间戳（微秒）"`
 	UseTs          time.Duration         `gorm:"not null;default:0;comment:总共使用时间微秒"`
 	Exception      *trace.ExceptionStack `gorm:"json;not null;comment:异常信息"`
+	MethodName     string                `gorm:"not null;default:'';comment:调用方法"`
 }
 
 type TraceDetailDatabasePO struct {
@@ -52,6 +52,15 @@ type TraceDetailHandPO struct {
 	Name              string `gorm:"not null;default:'';comment:名称"`
 }
 type TraceDetailHttpPO struct {
+	BaseTraceDetailPO `gorm:"embedded"`
+	Method            string                                 `gorm:"not null;default:'';comment:post/get/put/delete"`
+	Url               string                                 `gorm:"not null;default:'';comment:请求url"`
+	Headers           collections.Dictionary[string, string] `gorm:"type:String;json;not null;comment:请求头部"`
+	RequestBody       string                                 `gorm:"not null;default:'';comment:入参"`
+	ResponseBody      string                                 `gorm:"not null;default:'';comment:出参"`
+	StatusCode        int                                    `gorm:"not null;default:0;comment:状态码"`
+}
+type TraceDetailGrpcPO struct {
 	BaseTraceDetailPO `gorm:"embedded"`
 	Method            string                                 `gorm:"not null;default:'';comment:post/get/put/delete"`
 	Url               string                                 `gorm:"not null;default:'';comment:请求url"`

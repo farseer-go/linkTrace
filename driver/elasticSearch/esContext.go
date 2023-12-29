@@ -15,6 +15,7 @@ type esContext struct {
 	TraceDetailEtcd     elasticSearch.IndexSet[TraceDetailEtcdPO]     `es:"index=trace_detail_etcd_yyyy_MM;alias=trace_detail_etcd;shards=1;replicas=0;refresh=3"`
 	TraceDetailHand     elasticSearch.IndexSet[TraceDetailHandPO]     `es:"index=trace_detail_hand_yyyy_MM;alias=trace_detail_hand;shards=1;replicas=0;refresh=3"`
 	TraceDetailHttp     elasticSearch.IndexSet[TraceDetailHttpPO]     `es:"index=trace_detail_http_yyyy_MM;alias=trace_detail_http;shards=1;replicas=0;refresh=3"`
+	TraceDetailGrpc     elasticSearch.IndexSet[TraceDetailGrpcPO]     `es:"index=trace_detail_grpc_yyyy_MM;alias=trace_detail_http;shards=1;replicas=0;refresh=3"`
 	TraceDetailMq       elasticSearch.IndexSet[TraceDetailMqPO]       `es:"index=trace_detail_mq_yyyy_MM;alias=trace_detail_mq;shards=1;replicas=0;refresh=3"`
 	TraceDetailRedis    elasticSearch.IndexSet[TraceDetailRedisPO]    `es:"index=trace_detail_redis_yyyy_MM;alias=trace_detail_redis;shards=1;replicas=0;refresh=3"`
 }

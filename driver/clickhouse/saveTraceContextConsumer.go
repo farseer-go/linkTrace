@@ -17,6 +17,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	lstTraceDetailEtcd := collections.NewList[TraceDetailEtcdPO]()
 	lstTraceDetailHand := collections.NewList[TraceDetailHandPO]()
 	lstTraceDetailHttp := collections.NewList[TraceDetailHttpPO]()
+	lstTraceDetailGrpc := collections.NewList[TraceDetailGrpcPO]()
 	lstTraceDetailMq := collections.NewList[TraceDetailMqPO]()
 	lstTraceDetailRedis := collections.NewList[TraceDetailRedisPO]()
 
@@ -73,6 +74,14 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					httpPO.Exception = &detailType.Exception
 				}
 				lstTraceDetailHttp.Add(httpPO)
+			case *linkTrace.TraceDetailGrpc:
+				grpcPO := mapper.Single[TraceDetailGrpcPO](*detailType)
+				grpcPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
+				_ = mapper.Auto(traceContext, &grpcPO.BaseTraceDetailPO)
+				if !detailType.Exception.IsNil() {
+					grpcPO.Exception = &detailType.Exception
+				}
+				lstTraceDetailGrpc.Add(grpcPO)
 			case *linkTrace.TraceDetailMq:
 				mqPO := mapper.Single[TraceDetailMqPO](*detailType)
 				mqPO.BaseTraceDetailPO = mapper.Single[BaseTraceDetailPO](detailType.BaseTraceDetail)
@@ -115,6 +124,10 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	}
 	if lstTraceDetailHttp.Count() > 0 {
 		_, err = CHContext.TraceDetailHttp.InsertList(lstTraceDetailHttp, 2000)
+		flog.ErrorIfExists(err)
+	}
+	if lstTraceDetailGrpc.Count() > 0 {
+		_, err = CHContext.TraceDetailGrpc.InsertList(lstTraceDetailGrpc, 2000)
 		flog.ErrorIfExists(err)
 	}
 	if lstTraceDetailMq.Count() > 0 {
