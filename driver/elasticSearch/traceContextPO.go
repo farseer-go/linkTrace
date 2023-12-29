@@ -16,7 +16,7 @@ type TraceContextPO struct {
 	StartTs       int64                // 调用开始时间戳（微秒）
 	EndTs         int64                // 调用结束时间戳（微秒）
 	UseTs         time.Duration        // 总共使用时间戳（微秒）
-	UseDesc       string               `gorm:"-"`
+	UseDesc       string               // 总共使用时间（描述）
 	TraceType     eumTraceType.Enum    // 状态码
 	List          []trace.ITraceDetail `es_type:"object"` // 调用的上下文
 	Exception     *ExceptionStackPO    `es_type:"object"` // 异常信息
@@ -24,6 +24,7 @@ type TraceContextPO struct {
 	Consumer      ConsumerContextPO    `es_type:"object"` // 消费上下文
 	Task          TaskContextPO        `es_type:"object"` // 任务上下文
 	WatchKey      WatchKeyContextPO    `es_type:"object"` // Etcd上下文
+	CreateAt      time.Time            // 请求时间
 }
 
 type WebContextPO struct {

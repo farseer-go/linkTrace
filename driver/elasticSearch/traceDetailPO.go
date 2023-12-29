@@ -23,8 +23,9 @@ type BaseTraceDetailPO struct {
 	StartTs        int64                 // 调用开始时间戳（微秒）
 	EndTs          int64                 // 调用停止时间戳（微秒）
 	UseTs          time.Duration         // 总共使用时间微秒
-	UseDesc        string                `gorm:"-"`
+	UseDesc        string                // 总共使用时间（描述）
 	Exception      *trace.ExceptionStack `es_type:"object"` // 异常信息
+	CreateAt       time.Time             // 请求时间
 }
 
 type TraceDetailDatabasePO struct {

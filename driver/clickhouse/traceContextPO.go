@@ -13,9 +13,9 @@ type TraceContextPO struct {
 	AppIp             string            `gorm:"not null;default:'';comment:应用IP"`
 	ParentAppName     string            `gorm:"not null;default:'';comment:上游应用"`
 	StartTs           int64             `gorm:"not null;default:0;comment:调用开始时间戳（微秒）"`
-	EndTs             int64             `gorm:"not null;default:0;comment:调用结束时间戳"`
-	UseTs             time.Duration     `gorm:"not null;default:0;comment:总共使用时间微秒"`
-	UseDesc           string            `gorm:"-"`
+	EndTs             int64             `gorm:"not null;default:0;comment:调用结束时间戳（微秒）"`
+	UseTs             time.Duration     `gorm:"not null;default:0;comment:总共使用时间（微秒）"`
+	UseDesc           string            `gorm:"not null;default:'';comment:总共使用时间（描述）"`
 	TraceType         eumTraceType.Enum `gorm:"not null;comment:入口类型"`
 	Exception         *ExceptionStackPO `gorm:"json;not null;comment:异常信息"`
 	List              []any             `gorm:"json;not null;comment:调用的上下文"`
@@ -23,6 +23,7 @@ type TraceContextPO struct {
 	ConsumerContextPO `gorm:"embedded;not null;comment:消费上下文"`
 	TaskContextPO     `gorm:"embedded;not null;comment:任务上下文"`
 	WatchKeyContextPO `gorm:"embedded;not null;comment:Etcd上下文"`
+	CreateAt          time.Time `gorm:"type:DateTime64(3);not null;comment:请求时间"`
 }
 
 type WebContextPO struct {
