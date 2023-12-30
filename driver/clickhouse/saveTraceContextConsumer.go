@@ -31,7 +31,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 			po.Exception = &exceptionStackPO
 		}
 		po.UseDesc = po.UseTs.String()
-		po.CreateAt = dateTime.NewUnixMilli(po.StartTs)
+		po.CreateAt = dateTime.NewUnixMicro(po.StartTs)
 		lstTraceContext.Add(po)
 
 		// 明细
@@ -45,7 +45,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					databasePO.Exception = &detailType.Exception
 				}
 				databasePO.UseDesc = databasePO.UseTs.String()
-				databasePO.CreateAt = dateTime.NewUnixMilli(databasePO.StartTs)
+				databasePO.CreateAt = dateTime.NewUnixMicro(databasePO.StartTs)
 				lstTraceDetailDatabase.Add(databasePO)
 			case *linkTrace.TraceDetailEs:
 				esPO := mapper.Single[TraceDetailEsPO](*detailType)
@@ -55,7 +55,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					esPO.Exception = &detailType.Exception
 				}
 				esPO.UseDesc = esPO.UseTs.String()
-				esPO.CreateAt = dateTime.NewUnixMilli(esPO.StartTs)
+				esPO.CreateAt = dateTime.NewUnixMicro(esPO.StartTs)
 				lstTraceDetailEs.Add(esPO)
 			case *linkTrace.TraceDetailEtcd:
 				etcdPO := mapper.Single[TraceDetailEtcdPO](*detailType)
@@ -65,7 +65,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					etcdPO.Exception = &detailType.Exception
 				}
 				etcdPO.UseDesc = etcdPO.UseTs.String()
-				etcdPO.CreateAt = dateTime.NewUnixMilli(etcdPO.StartTs)
+				etcdPO.CreateAt = dateTime.NewUnixMicro(etcdPO.StartTs)
 				lstTraceDetailEtcd.Add(etcdPO)
 			case *linkTrace.TraceDetailHand:
 				handPO := mapper.Single[TraceDetailHandPO](*detailType)
@@ -75,7 +75,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					handPO.Exception = &detailType.Exception
 				}
 				handPO.UseDesc = handPO.UseTs.String()
-				handPO.CreateAt = dateTime.NewUnixMilli(handPO.StartTs)
+				handPO.CreateAt = dateTime.NewUnixMicro(handPO.StartTs)
 				lstTraceDetailHand.Add(handPO)
 			case *linkTrace.TraceDetailHttp:
 				httpPO := mapper.Single[TraceDetailHttpPO](*detailType)
@@ -85,7 +85,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					httpPO.Exception = &detailType.Exception
 				}
 				httpPO.UseDesc = httpPO.UseTs.String()
-				httpPO.CreateAt = dateTime.NewUnixMilli(httpPO.StartTs)
+				httpPO.CreateAt = dateTime.NewUnixMicro(httpPO.StartTs)
 				lstTraceDetailHttp.Add(httpPO)
 			case *linkTrace.TraceDetailGrpc:
 				grpcPO := mapper.Single[TraceDetailGrpcPO](*detailType)
@@ -95,7 +95,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					grpcPO.Exception = &detailType.Exception
 				}
 				grpcPO.UseDesc = grpcPO.UseTs.String()
-				grpcPO.CreateAt = dateTime.NewUnixMilli(grpcPO.StartTs)
+				grpcPO.CreateAt = dateTime.NewUnixMicro(grpcPO.StartTs)
 				lstTraceDetailGrpc.Add(grpcPO)
 			case *linkTrace.TraceDetailMq:
 				mqPO := mapper.Single[TraceDetailMqPO](*detailType)
@@ -105,7 +105,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					mqPO.Exception = &detailType.Exception
 				}
 				mqPO.UseDesc = mqPO.UseTs.String()
-				mqPO.CreateAt = dateTime.NewUnixMilli(mqPO.StartTs)
+				mqPO.CreateAt = dateTime.NewUnixMicro(mqPO.StartTs)
 				lstTraceDetailMq.Add(mqPO)
 			case *linkTrace.TraceDetailRedis:
 				redisPO := mapper.Single[TraceDetailRedisPO](*detailType)
@@ -115,7 +115,7 @@ func saveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 					redisPO.Exception = &detailType.Exception
 				}
 				redisPO.UseDesc = redisPO.UseTs.String()
-				redisPO.CreateAt = dateTime.NewUnixMilli(redisPO.StartTs)
+				redisPO.CreateAt = dateTime.NewUnixMicro(redisPO.StartTs)
 				lstTraceDetailRedis.Add(redisPO)
 			}
 		}
