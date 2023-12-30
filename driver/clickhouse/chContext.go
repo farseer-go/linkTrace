@@ -22,6 +22,10 @@ type chContext struct {
 
 // initCHContext 初始化上下文
 func initCHContext() {
-	data.RegisterInternalContext("LinkTrace", configure.GetString("LinkTrace.CH"))
+	configString := configure.GetString("LinkTrace.CH")
+	if configString == "" {
+		panic("[farseer.yaml]LinkTrace.CH，没有正确配置")
+	}
+	data.RegisterInternalContext("LinkTrace", configString)
 	CHContext = data.NewContext[chContext]("LinkTrace")
 }

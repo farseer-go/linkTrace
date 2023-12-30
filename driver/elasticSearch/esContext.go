@@ -22,6 +22,10 @@ type esContext struct {
 
 // initEsContext 初始化上下文
 func initEsContext() {
-	elasticSearch.RegisterInternalContext("LinkTrace", configure.GetString("LinkTrace.ES"))
+	configString := configure.GetString("LinkTrace.ES")
+	if configString == "" {
+		panic("[farseer.yaml]LinkTrace.ES，没有正确配置")
+	}
+	elasticSearch.RegisterInternalContext("LinkTrace", configString)
 	ESContext = elasticSearch.NewContext[esContext]("LinkTrace")
 }
