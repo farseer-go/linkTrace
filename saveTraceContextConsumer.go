@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/farseer-go/collections"
-	"github.com/farseer-go/fs"
 	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/exception"
@@ -48,7 +47,7 @@ func upload(lstTraceContext collections.List[TraceContext]) error {
 	// 链路追踪
 	if traceContext := container.Resolve[trace.IManager]().GetCurTrace(); traceContext != nil {
 		newRequest.Header.Set("Trace-Id", parse.ToString(traceContext.GetTraceId()))
-		newRequest.Header.Set("Trace-App-Name", fs.AppName)
+		newRequest.Header.Set("Trace-App-Name", core.AppName)
 	}
 	client := &http.Client{}
 	rsp, err := client.Do(newRequest)

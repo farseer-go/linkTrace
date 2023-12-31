@@ -3,7 +3,7 @@ package linkTrace
 import (
 	"fmt"
 	"github.com/farseer-go/collections"
-	"github.com/farseer-go/fs"
+	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/snowflake"
 	"github.com/farseer-go/fs/trace"
@@ -27,9 +27,9 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		traceId = snowflake.GenerateId()
 	}
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
@@ -117,9 +117,9 @@ func (*traceManager) TraceMqSend(method string, server string, exchange string, 
 func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey string) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
@@ -139,15 +139,15 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		ConsumerContext: ConsumerContext{
-			ConsumerServer:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
+			ConsumerServer:    fmt.Sprintf("%s/%s/%v", core.AppName, core.AppIp, core.AppId),
 			ConsumerQueueName: queueName + "/" + subscribeName,
 		},
 	}
@@ -160,9 +160,9 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.I
 func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
@@ -180,9 +180,9 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
@@ -202,9 +202,9 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskG
 func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
@@ -224,9 +224,9 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
-		AppId:         fs.AppId,
-		AppName:       fs.AppName,
-		AppIp:         fs.AppIp,
+		AppId:         core.AppId,
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
 		ParentAppName: "",
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
