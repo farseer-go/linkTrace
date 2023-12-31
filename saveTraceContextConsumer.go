@@ -54,7 +54,7 @@ func upload(lstTraceContext collections.List[TraceContext]) error {
 
 	apiRsp := core.NewApiResponseByReader[any](rsp.Body)
 	if apiRsp.StatusCode != 200 {
-		return fmt.Errorf("上传到%s失败（%v）：%s", url, rsp.StatusCode, apiRsp.StatusMessage)
+		return fmt.Errorf("上传链路记录到%s失败（%v）：%s", url, rsp.StatusCode, apiRsp.StatusMessage)
 	}
 
 	return err
