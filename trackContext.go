@@ -48,9 +48,9 @@ func (receiver WebContext) IsNil() bool {
 }
 
 type ConsumerContext struct {
-	ConsumerServer     string
-	ConsumerQueueName  string
-	ConsumerRoutingKey string
+	ConsumerServer     string // MQ服务器
+	ConsumerQueueName  string // 队列名称
+	ConsumerRoutingKey string // 路由KEY
 }
 
 func (receiver ConsumerContext) IsNil() bool {
@@ -58,9 +58,9 @@ func (receiver ConsumerContext) IsNil() bool {
 }
 
 type TaskContext struct {
-	TaskName    string
-	TaskGroupId int64
-	TaskId      int64
+	TaskName    string // 任务名称
+	TaskGroupId int64  // 任务组ID
+	TaskId      int64  // 任务ID
 }
 
 func (receiver TaskContext) IsNil() bool {
@@ -68,7 +68,7 @@ func (receiver TaskContext) IsNil() bool {
 }
 
 type WatchKeyContext struct {
-	WatchKey string
+	WatchKey string // KEY
 }
 
 func (receiver WatchKeyContext) IsNil() bool {

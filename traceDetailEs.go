@@ -19,3 +19,9 @@ func (receiver *TraceDetailEs) GetTraceDetail() *trace.BaseTraceDetail {
 func (receiver *TraceDetailEs) ToString() string {
 	return fmt.Sprintf("[%s]耗时：%s，%s IndexName=%s，AliasesName=%s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.MethodName, receiver.IndexName, receiver.AliasesName)
 }
+
+func (receiver *TraceDetailEs) Desc() (caption string, desc string) {
+	caption = fmt.Sprintf("执行ES => %s %s", receiver.IndexName, receiver.AliasesName)
+	desc = fmt.Sprintf("%s %s", receiver.IndexName, receiver.AliasesName)
+	return
+}

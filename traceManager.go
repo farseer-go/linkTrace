@@ -101,16 +101,6 @@ func (*traceManager) TraceHand(name string) trace.ITraceDetail {
 	return detail
 }
 
-// TraceKeyLocation 关键位置埋点
-func (*traceManager) TraceKeyLocation(name string) trace.ITraceDetail {
-	detail := &TraceDetailHand{
-		BaseTraceDetail: newTraceDetail(eumCallType.KeyLocation, ""),
-		Name:            name,
-	}
-	add(detail)
-	return detail
-}
-
 // TraceMqSend mq发送埋点
 func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) trace.ITraceDetail {
 	detail := &TraceDetailMq{
