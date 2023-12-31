@@ -136,7 +136,7 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 }
 
 // EntryQueueConsumer queue 消费埋点
-func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContext {
+func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.ITraceContext {
 	traceId := snowflake.GenerateId()
 	context := &TraceContext{
 		AppId:         fs.AppId,
@@ -148,7 +148,7 @@ func (*traceManager) EntryQueueConsumer(subscribeName string) trace.ITraceContex
 		TraceType:     eumTraceType.QueueConsumer,
 		ConsumerContext: ConsumerContext{
 			ConsumerServer:    fmt.Sprintf("%s/%s/%v", fs.AppName, fs.AppIp, fs.AppId),
-			ConsumerQueueName: subscribeName,
+			ConsumerQueueName: queueName + "/" + subscribeName,
 		},
 	}
 	trace.CurTraceContext.Set(context)
