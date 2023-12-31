@@ -316,6 +316,7 @@ func add(traceDetail trace.ITraceDetail) {
 		} else {
 			detail.UnTraceTs = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
 		}
+		detail.TraceId, detail.AppName, detail.AppId, detail.AppIp, detail.ParentAppName = t.GetAppInfo()
 		t.AddDetail(traceDetail)
 	}
 }

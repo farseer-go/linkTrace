@@ -174,3 +174,7 @@ func (receiver *TraceContext) Error(err error) {
 		receiver.Exception.ExceptionCallFile, receiver.Exception.ExceptionCallFuncName, receiver.Exception.ExceptionCallLine = trace.GetCallerInfo()
 	}
 }
+
+func (receiver *TraceContext) GetAppInfo() (int64, string, int64, string, string) {
+	return receiver.TraceId, receiver.AppName, receiver.AppId, receiver.AppIp, receiver.ParentAppName
+}
