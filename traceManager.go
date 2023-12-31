@@ -312,7 +312,7 @@ func add(traceDetail trace.ITraceDetail) {
 		detail.Timeline = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
 		details := t.GetList()
 		if len(details) > 0 {
-			detail.UnTraceTs = time.Duration(detail.StartTs-details[len(details)-1].GetTraceDetail().EndTs) * time.Microsecond
+			detail.UnTraceTs = time.Duration(detail.StartTs-details[len(details)-1].(trace.ITraceDetail).GetTraceDetail().EndTs) * time.Microsecond
 		} else {
 			detail.UnTraceTs = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
 		}

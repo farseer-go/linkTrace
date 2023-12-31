@@ -19,9 +19,3 @@ func (receiver *TraceDetailHand) GetTraceDetail() *trace.BaseTraceDetail {
 func (receiver *TraceDetailHand) ToString() string {
 	return fmt.Sprintf("[%s]耗时：%s， %s", flog.Yellow(receiver.CallType.ToString()), flog.Red(receiver.UseTs.String()), receiver.Name)
 }
-
-func (receiver *TraceDetailHand) Desc() (caption string, desc string) {
-	caption = fmt.Sprintf("手动埋点 => %s", receiver.Name)
-	desc = fmt.Sprintf("%s", receiver.Name)
-	return
-}

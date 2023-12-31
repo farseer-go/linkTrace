@@ -36,13 +36,3 @@ func (receiver *TraceDetailHttp) SetHttpRequest(url string, head map[string]any,
 		receiver.Headers.Add(k, parse.ToString(v))
 	}
 }
-
-func (receiver *TraceDetailHttp) Desc() (caption string, desc string) {
-	caption = fmt.Sprintf("调用http => %v %s %s", receiver.StatusCode, receiver.Method, receiver.Url)
-	lstHeader := collections.NewList[string]()
-	for k, v := range receiver.Headers.ToMap() {
-		lstHeader.Add(fmt.Sprintf("%s=%v", k, v))
-	}
-	desc = fmt.Sprintf("头部：%s 入参：%s 出参：%s", lstHeader.ToString(","), receiver.RequestBody, receiver.ResponseBody)
-	return
-}

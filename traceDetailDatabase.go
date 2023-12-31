@@ -42,13 +42,3 @@ func (receiver *TraceDetailDatabase) SetSql(connectionString string, DbName stri
 	receiver.Sql = sql
 	receiver.RowsAffected = rowsAffected
 }
-
-func (receiver *TraceDetailDatabase) Desc() (caption string, desc string) {
-	if receiver.TableName == "" && receiver.Sql == "" {
-		caption = fmt.Sprintf("打开数据库 => %s %s", receiver.DbName, receiver.ConnectionString)
-	} else {
-		caption = fmt.Sprintf("执行数据库 => %s %s 影响%v行", receiver.DbName, receiver.TableName, receiver.RowsAffected)
-	}
-	desc = receiver.Sql
-	return
-}

@@ -3,6 +3,7 @@ package linkTrace
 import (
 	"fmt"
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
@@ -13,22 +14,24 @@ import (
 )
 
 type TraceContext struct {
-	TraceId       int64                // 上下文ID
-	AppId         int64                // 应用ID
-	AppName       string               // 应用名称
-	AppIp         string               // 应用IP
-	ParentAppName string               // 上游应用
-	StartTs       int64                // 调用开始时间戳（微秒）
-	EndTs         int64                // 调用结束时间戳（微秒）
-	UseTs         time.Duration        // 总共使用时间微秒
-	TraceType     eumTraceType.Enum    // 状态码
-	List          []trace.ITraceDetail // 调用的上下文
-	ignore        bool                 // 忽略这次的链路追踪
-	Exception     trace.ExceptionStack // 异常信息
+	TraceId       int64                 // 上下文ID
+	AppId         int64                 // 应用ID
+	AppName       string                // 应用名称
+	AppIp         string                // 应用IP
+	ParentAppName string                // 上游应用
+	StartTs       int64                 // 调用开始时间戳（微秒）
+	EndTs         int64                 // 调用结束时间戳（微秒）
+	UseTs         time.Duration         // 总共使用时间微秒
+	UseDesc       string                // 总共使用时间（描述）
+	TraceType     eumTraceType.Enum     // 状态码
+	List          []any                 // 调用的上下文trace.ITraceDetail
+	ignore        bool                  // 忽略这次的链路追踪
+	Exception     *trace.ExceptionStack // 异常信息
 	WebContext
 	ConsumerContext
 	TaskContext
 	WatchKeyContext
+	CreateAt dateTime.DateTime // 请求时间
 }
 
 type WebContext struct {
@@ -97,9 +100,9 @@ func (receiver *TraceContext) End() {
 	receiver.EndTs = time.Now().UnixMicro()
 	receiver.UseTs = time.Duration(receiver.EndTs-receiver.StartTs) * time.Microsecond
 	// 移除忽略的明细
-	var newList []trace.ITraceDetail
+	var newList []any
 	for _, detail := range receiver.List {
-		if !detail.GetTraceDetail().IsIgnore() {
+		if !detail.(trace.ITraceDetail).GetTraceDetail().IsIgnore() {
 			newList = append(newList, detail)
 		}
 	}
@@ -118,7 +121,7 @@ func (receiver *TraceContext) Ignore() {
 }
 
 // GetList 获取链路明细
-func (receiver *TraceContext) GetList() []trace.ITraceDetail {
+func (receiver *TraceContext) GetList() []any {
 	return receiver.List
 }
 
@@ -133,17 +136,17 @@ func (receiver *TraceContext) printLog() {
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
 		for i := 0; i < len(receiver.List); i++ {
-			tab := strings.Repeat("\t", receiver.List[i].GetLevel()-1)
-			detail := receiver.List[i].GetTraceDetail()
-			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List[i].ToString())
+			tab := strings.Repeat("\t", receiver.List[i].(trace.ITraceDetail).GetLevel()-1)
+			detail := receiver.List[i].(trace.ITraceDetail).GetTraceDetail()
+			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), receiver.List[i].(trace.ITraceDetail).ToString())
 			lst.Add(log)
 
-			if detail.Exception.ExceptionIsException {
+			if detail.Exception != nil && detail.Exception.ExceptionIsException {
 				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.ExceptionCallFile, flog.Blue(detail.Exception.ExceptionCallLine), flog.Red(detail.Exception.ExceptionCallFuncName), flog.Red(detail.Exception.ExceptionMessage)))
 			}
 		}
 
-		if receiver.Exception.ExceptionIsException {
+		if receiver.Exception != nil && receiver.Exception.ExceptionIsException {
 			lst.Add(fmt.Sprintf("%s%s:%s %s %s", flog.Red("【异常】"), flog.Blue(receiver.Exception.ExceptionCallFile), flog.Blue(receiver.Exception.ExceptionCallLine), flog.Green(receiver.Exception.ExceptionCallFuncName), flog.Red(receiver.Exception.ExceptionMessage)))
 		}
 
@@ -164,8 +167,10 @@ func (receiver *TraceContext) printLog() {
 
 func (receiver *TraceContext) Error(err error) {
 	if err != nil {
-		receiver.Exception.ExceptionIsException = true
-		receiver.Exception.ExceptionMessage = err.Error()
+		receiver.Exception = &trace.ExceptionStack{
+			ExceptionIsException: true,
+			ExceptionMessage:     err.Error(),
+		}
 		receiver.Exception.ExceptionCallFile, receiver.Exception.ExceptionCallFuncName, receiver.Exception.ExceptionCallLine = trace.GetCallerInfo()
 	}
 }
