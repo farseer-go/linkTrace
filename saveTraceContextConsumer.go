@@ -12,6 +12,7 @@ import (
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
 	"net/http"
+	"time"
 )
 
 // FopsServer fops地址
@@ -29,6 +30,9 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	if err := upload(lstTraceContext); err != nil {
 		exception.ThrowRefuseException(err.Error())
 	}
+
+	// 控制3秒执行一次
+	<-time.After(3 * time.Second)
 	return
 }
 
