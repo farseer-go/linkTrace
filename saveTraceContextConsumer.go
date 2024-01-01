@@ -52,7 +52,7 @@ func upload(lstTraceContext collections.List[TraceContext]) error {
 	client := &http.Client{}
 	rsp, err := client.Do(newRequest)
 	if err != nil {
-		return err
+		return fmt.Errorf("上传链路记录到%s失败：%s", url, err.Error())
 	}
 
 	apiRsp := core.NewApiResponseByReader[any](rsp.Body)
