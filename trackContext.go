@@ -14,6 +14,7 @@ import (
 )
 
 type TraceContext struct {
+	TraceIdN      string                // 上下文ID
 	TraceId       int64                 // 上下文ID
 	AppId         int64                 // 应用ID
 	AppName       string                // 应用名称
@@ -177,4 +178,8 @@ func (receiver *TraceContext) Error(err error) {
 
 func (receiver *TraceContext) GetAppInfo() (int64, string, int64, string, string) {
 	return receiver.TraceId, receiver.AppName, receiver.AppId, receiver.AppIp, receiver.ParentAppName
+}
+
+func (receiver *TraceContext) SetTraceIdN() {
+	receiver.TraceIdN = parse.ToString(receiver.TraceId)
 }
