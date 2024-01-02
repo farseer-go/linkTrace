@@ -17,6 +17,7 @@ type TraceContext struct {
 	TraceIdN      string                // 上下文ID
 	TraceId       int64                 // 上下文ID
 	AppId         int64                 // 应用ID
+	AppIdN        string                // 应用ID
 	AppName       string                // 应用名称
 	AppIp         string                // 应用IP
 	ParentAppName string                // 上游应用
@@ -180,6 +181,8 @@ func (receiver *TraceContext) GetAppInfo() (int64, string, int64, string, string
 	return receiver.TraceId, receiver.AppName, receiver.AppId, receiver.AppIp, receiver.ParentAppName
 }
 
+// SetTraceIdN Int64转String（前端需要）
 func (receiver *TraceContext) SetTraceIdN() {
 	receiver.TraceIdN = parse.ToString(receiver.TraceId)
+	receiver.AppIdN = parse.ToString(receiver.AppId)
 }
