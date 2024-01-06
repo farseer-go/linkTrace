@@ -23,7 +23,7 @@ type TraceContext struct {
 	ParentAppName string                // 上游应用
 	StartTs       int64                 // 调用开始时间戳（微秒）
 	EndTs         int64                 // 调用结束时间戳（微秒）
-	UseTs         time.Duration         // 总共使用时间微秒
+	UseTs         time.Duration         // 总共使用时间（微秒）
 	UseDesc       string                // 总共使用时间（描述）
 	TraceType     eumTraceType.Enum     // 状态码
 	List          []any                 // 调用的上下文trace.ITraceDetail
