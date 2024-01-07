@@ -22,12 +22,12 @@ func (*traceManager) GetCurTrace() trace.ITraceContext {
 // EntryWebApi Webapi入口
 func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestBody string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
-	traceId := parse.ToInt64(headerDictionary.GetValue("Trace-Id"))
-	if traceId == 0 {
-		traceId = snowflake.GenerateId()
+	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
+	if traceId == "" {
+		traceId = parse.ToString(snowflake.GenerateId())
 	}
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
@@ -115,9 +115,9 @@ func (*traceManager) TraceMqSend(method string, server string, exchange string, 
 
 // EntryMqConsumer mq 消费埋点
 func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey string) trace.ITraceContext {
-	traceId := snowflake.GenerateId()
+	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -137,9 +137,9 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 
 // EntryQueueConsumer queue 消费埋点
 func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.ITraceContext {
-	traceId := snowflake.GenerateId()
+	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -158,9 +158,9 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.I
 
 // EntryTask 创建本地任务入口
 func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
-	traceId := snowflake.GenerateId()
+	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -178,13 +178,13 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 
 // EntryTaskGroup 创建本地任务入口（调度中心专用）
 func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
-	traceId := snowflake.GenerateId()
+	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
-		TraceId:       traceId,
+		TraceId:       parse.ToString(traceId),
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		TaskContext: TaskContext{
@@ -200,9 +200,9 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskG
 
 // EntryFSchedule 创建调度中心入口
 func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
-	traceId := snowflake.GenerateId()
+	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -222,9 +222,9 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 
 // EntryWatchKey 创建etcd入口
 func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
-	traceId := snowflake.GenerateId()
+	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
-		AppId:         core.AppId,
+		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -287,12 +287,12 @@ func (*traceManager) TraceGrpc(method string, url string) trace.ITraceDetail {
 func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTraceDetail {
 	// 获取当前层级列表
 	lstScope := trace.ScopeLevel.Get()
-	var parentDetailId int64
+	var parentDetailId string
 	if len(lstScope) > 0 {
 		parentDetailId = lstScope[len(lstScope)-1].DetailId
 	}
 	baseTraceDetail := trace.BaseTraceDetail{
-		DetailId:       snowflake.GenerateId(),
+		DetailId:       parse.ToString(snowflake.GenerateId()),
 		Level:          len(lstScope) + 1,
 		ParentDetailId: parentDetailId,
 		MethodName:     methodName,
