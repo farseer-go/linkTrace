@@ -177,7 +177,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 }
 
 // EntryTaskGroup 创建本地任务入口（调度中心专用）
-func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
+func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskId int64) trace.ITraceContext {
 	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
@@ -188,8 +188,8 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskG
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		TaskContext: TaskContext{
-			TaskName:    fmt.Sprintf("%s，任务组=(%v)%s，任务ID=%v", taskName, taskGroupId, taskGroupName, taskId),
-			TaskGroupId: taskGroupId,
+			TaskName:    fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
+			TaskGroupName: taskGroupName,
 			TaskId:      taskId,
 		},
 	}
@@ -199,7 +199,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskG
 }
 
 // EntryFSchedule 创建调度中心入口
-func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, taskId int64) trace.ITraceContext {
+func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64) trace.ITraceContext {
 	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
@@ -211,7 +211,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskGroupId int64, tas
 		TraceType:     eumTraceType.FSchedule,
 		TaskContext: TaskContext{
 			TaskName:    taskGroupName,
-			TaskGroupId: taskGroupId,
+			TaskGroupName: taskGroupName,
 			TaskId:      taskId,
 		},
 	}

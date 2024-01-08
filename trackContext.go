@@ -62,12 +62,12 @@ func (receiver ConsumerContext) IsNil() bool {
 
 type TaskContext struct {
 	TaskName    string // 任务名称
-	TaskGroupId int64  // 任务组ID
+	TaskGroupName string  // 任务组ID
 	TaskId      int64  // 任务ID
 }
 
 func (receiver TaskContext) IsNil() bool {
-	return receiver.TaskName == "" && receiver.TaskGroupId == 0 && receiver.TaskId == 0
+	return receiver.TaskName == "" && receiver.TaskGroupName == "" && receiver.TaskId == 0
 }
 
 type WatchKeyContext struct {
