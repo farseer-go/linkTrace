@@ -9,6 +9,6 @@ require (
 )
 
 require (
-	github.com/timandy/routine v1.1.3 // indirect
+	github.com/timandy/routine v1.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
