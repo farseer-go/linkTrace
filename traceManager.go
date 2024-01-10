@@ -5,7 +5,7 @@ import (
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/parse"
-	"github.com/farseer-go/fs/snowflake"
+	"github.com/farseer-go/fs/sonyflake"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/fs/trace/eumCallType"
 	"github.com/farseer-go/linkTrace/eumTraceType"
@@ -24,7 +24,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 	headerDictionary := collections.NewDictionaryFromMap(header)
 	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
 	if traceId == "" {
-		traceId = parse.ToString(snowflake.GenerateId())
+		traceId = parse.ToString(sonyflake.GenerateId())
 	}
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
@@ -115,7 +115,7 @@ func (*traceManager) TraceMqSend(method string, server string, exchange string, 
 
 // EntryMqConsumer mq 消费埋点
 func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey string) trace.ITraceContext {
-	traceId := parse.ToString(snowflake.GenerateId())
+	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
@@ -137,7 +137,7 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 
 // EntryQueueConsumer queue 消费埋点
 func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.ITraceContext {
-	traceId := parse.ToString(snowflake.GenerateId())
+	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
@@ -158,7 +158,7 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.I
 
 // EntryTask 创建本地任务入口
 func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
-	traceId := parse.ToString(snowflake.GenerateId())
+	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
@@ -178,7 +178,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 
 // EntryTaskGroup 创建本地任务入口（调度中心专用）
 func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskId int64) trace.ITraceContext {
-	traceId := parse.ToString(snowflake.GenerateId())
+	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
@@ -200,7 +200,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 
 // EntryFSchedule 创建调度中心入口
 func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map[string]string) trace.ITraceContext {
-	traceId := parse.ToString(snowflake.GenerateId())
+	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
@@ -223,7 +223,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 
 // EntryWatchKey 创建etcd入口
 func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
-	traceId := parse.ToString(snowflake.GenerateId())
+	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
@@ -293,7 +293,7 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 		parentDetailId = lstScope[len(lstScope)-1].DetailId
 	}
 	baseTraceDetail := trace.BaseTraceDetail{
-		DetailId:       parse.ToString(snowflake.GenerateId()),
+		DetailId:       parse.ToString(sonyflake.GenerateId()),
 		Level:          len(lstScope) + 1,
 		ParentDetailId: parentDetailId,
 		MethodName:     methodName,
