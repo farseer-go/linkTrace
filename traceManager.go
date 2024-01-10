@@ -213,7 +213,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 			TaskName:      taskGroupName,
 			TaskGroupName: taskGroupName,
 			TaskId:        taskId,
-			Data:          data,
+			TaskData:      collections.NewDictionaryFromMap(data),
 		},
 	}
 	trace.CurTraceContext.Set(context)
