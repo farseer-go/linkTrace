@@ -188,9 +188,9 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		TaskContext: TaskContext{
-			TaskName:    fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
+			TaskName:      fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
 			TaskGroupName: taskGroupName,
-			TaskId:      taskId,
+			TaskId:        taskId,
 		},
 	}
 	trace.CurTraceContext.Set(context)
@@ -199,7 +199,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 }
 
 // EntryFSchedule 创建调度中心入口
-func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64) trace.ITraceContext {
+func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map[string]string) trace.ITraceContext {
 	traceId := parse.ToString(snowflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
@@ -210,9 +210,10 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64) trace.IT
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.FSchedule,
 		TaskContext: TaskContext{
-			TaskName:    taskGroupName,
+			TaskName:      taskGroupName,
 			TaskGroupName: taskGroupName,
-			TaskId:      taskId,
+			TaskId:        taskId,
+			Data:          data,
 		},
 	}
 	trace.CurTraceContext.Set(context)

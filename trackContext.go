@@ -61,9 +61,10 @@ func (receiver ConsumerContext) IsNil() bool {
 }
 
 type TaskContext struct {
-	TaskName    string // 任务名称
-	TaskGroupName string  // 任务组ID
-	TaskId      int64  // 任务ID
+	TaskName      string            // 任务名称
+	TaskGroupName string            // 任务组ID
+	TaskId        int64             // 任务ID
+	Data          map[string]string // 任务数据
 }
 
 func (receiver TaskContext) IsNil() bool {
