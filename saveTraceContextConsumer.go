@@ -18,8 +18,11 @@ import (
 // FopsServer fops地址
 var FopsServer string
 
-// SaveTraceContextConsumer 上传到FOPS中心
+// SaveTraceContextConsumer 上传链路记录到FOPS中心
 func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListAny, remainingCount int) {
+	// 控制3秒执行一次
+	<-time.After(3 * time.Second)
+
 	trace.CurTraceContext.Get().Ignore()
 	lstTraceContext := collections.NewList[TraceContext]()
 	lstMessage.Foreach(func(item *any) {
@@ -31,8 +34,6 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 		exception.ThrowRefuseException(err.Error())
 	}
 
-	// 控制3秒执行一次
-	<-time.After(3 * time.Second)
 	return
 }
 
