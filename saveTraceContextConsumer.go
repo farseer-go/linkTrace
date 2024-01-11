@@ -50,6 +50,7 @@ func uploadTrace(lstTraceContext any) error {
 	// 链路追踪
 	if traceContext := container.Resolve[trace.IManager]().GetCurTrace(); traceContext != nil {
 		newRequest.Header.Set("Trace-Id", parse.ToString(traceContext.GetTraceId()))
+		newRequest.Header.Set("Trace-Level", parse.ToString(traceContext.GetTraceLevel()))
 		newRequest.Header.Set("Trace-App-Name", core.AppName)
 	}
 	client := &http.Client{}

@@ -23,8 +23,13 @@ func (*traceManager) GetCurTrace() trace.ITraceContext {
 func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestBody string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
 	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
+	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
 	if traceId == "" {
 		traceId = parse.ToString(sonyflake.GenerateId())
+	}
+	// 默认从0层开始
+	if traceLevel > 0 {
+		traceLevel++
 	}
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
@@ -32,6 +37,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		AppIp:         core.AppIp,
 		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
 		TraceId:       traceId,
+		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
 		WebContext: WebContext{
@@ -47,70 +53,6 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
-}
-
-// TraceDatabase 数据库埋点
-func (*traceManager) TraceDatabase() trace.ITraceDetail {
-	detail := &TraceDetailDatabase{
-		BaseTraceDetail: newTraceDetail(eumCallType.Database, ""),
-	}
-	add(detail)
-	return detail
-}
-
-// TraceDatabaseOpen 数据库埋点
-func (*traceManager) TraceDatabaseOpen(dbName string, connectString string) trace.ITraceDetail {
-	detail := &TraceDetailDatabase{
-		BaseTraceDetail:  newTraceDetail(eumCallType.Database, ""),
-		DbName:           dbName,
-		ConnectionString: connectString,
-	}
-	add(detail)
-	return detail
-}
-
-// TraceElasticsearch Elasticsearch埋点
-func (*traceManager) TraceElasticsearch(method string, IndexName string, AliasesName string) trace.ITraceDetail {
-	detail := &TraceDetailEs{
-		BaseTraceDetail: newTraceDetail(eumCallType.Elasticsearch, method),
-		IndexName:       IndexName,
-		AliasesName:     AliasesName,
-	}
-	add(detail)
-	return detail
-}
-
-// TraceEtcd etcd埋点
-func (*traceManager) TraceEtcd(method string, key string, leaseID int64) trace.ITraceDetail {
-	detail := &TraceDetailEtcd{
-		BaseTraceDetail: newTraceDetail(eumCallType.Etcd, method),
-		Key:             key,
-		LeaseID:         leaseID,
-	}
-	add(detail)
-	return detail
-}
-
-// TraceHand 手动埋点
-func (*traceManager) TraceHand(name string) trace.ITraceDetail {
-	detail := &TraceDetailHand{
-		BaseTraceDetail: newTraceDetail(eumCallType.Hand, ""),
-		Name:            name,
-	}
-	add(detail)
-	return detail
-}
-
-// TraceMqSend mq发送埋点
-func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) trace.ITraceDetail {
-	detail := &TraceDetailMq{
-		BaseTraceDetail: newTraceDetail(eumCallType.Mq, method),
-		Server:          server,
-		Exchange:        exchange,
-		RoutingKey:      routingKey,
-	}
-	add(detail)
-	return detail
 }
 
 // EntryMqConsumer mq 消费埋点
@@ -239,6 +181,70 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 	trace.CurTraceContext.Set(context)
 	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
 	return context
+}
+
+// TraceDatabase 数据库埋点
+func (*traceManager) TraceDatabase() trace.ITraceDetail {
+	detail := &TraceDetailDatabase{
+		BaseTraceDetail: newTraceDetail(eumCallType.Database, ""),
+	}
+	add(detail)
+	return detail
+}
+
+// TraceDatabaseOpen 数据库埋点
+func (*traceManager) TraceDatabaseOpen(dbName string, connectString string) trace.ITraceDetail {
+	detail := &TraceDetailDatabase{
+		BaseTraceDetail:  newTraceDetail(eumCallType.Database, ""),
+		DbName:           dbName,
+		ConnectionString: connectString,
+	}
+	add(detail)
+	return detail
+}
+
+// TraceElasticsearch Elasticsearch埋点
+func (*traceManager) TraceElasticsearch(method string, IndexName string, AliasesName string) trace.ITraceDetail {
+	detail := &TraceDetailEs{
+		BaseTraceDetail: newTraceDetail(eumCallType.Elasticsearch, method),
+		IndexName:       IndexName,
+		AliasesName:     AliasesName,
+	}
+	add(detail)
+	return detail
+}
+
+// TraceEtcd etcd埋点
+func (*traceManager) TraceEtcd(method string, key string, leaseID int64) trace.ITraceDetail {
+	detail := &TraceDetailEtcd{
+		BaseTraceDetail: newTraceDetail(eumCallType.Etcd, method),
+		Key:             key,
+		LeaseID:         leaseID,
+	}
+	add(detail)
+	return detail
+}
+
+// TraceHand 手动埋点
+func (*traceManager) TraceHand(name string) trace.ITraceDetail {
+	detail := &TraceDetailHand{
+		BaseTraceDetail: newTraceDetail(eumCallType.Hand, ""),
+		Name:            name,
+	}
+	add(detail)
+	return detail
+}
+
+// TraceMqSend mq发送埋点
+func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) trace.ITraceDetail {
+	detail := &TraceDetailMq{
+		BaseTraceDetail: newTraceDetail(eumCallType.Mq, method),
+		Server:          server,
+		Exchange:        exchange,
+		RoutingKey:      routingKey,
+	}
+	add(detail)
+	return detail
 }
 
 // TraceMq open、create埋点

@@ -19,6 +19,7 @@ type TraceContext struct {
 	AppName       string                // 应用名称
 	AppIp         string                // 应用IP
 	ParentAppName string                // 上游应用
+	TraceLevel    int                   // 逐层递增（显示上下游顺序）
 	StartTs       int64                 // 调用开始时间戳（微秒）
 	EndTs         int64                 // 调用结束时间戳（微秒）
 	UseTs         time.Duration         // 总共使用时间（微秒）
@@ -88,7 +89,7 @@ func (receiver *TraceContext) SetBody(requestBody string, statusCode int, respon
 func (receiver *TraceContext) GetTraceId() string {
 	return receiver.TraceId
 }
-
+func (receiver *TraceContext) GetTraceLevel() int { return receiver.TraceLevel }
 func (receiver *TraceContext) GetStartTs() int64 {
 	return receiver.StartTs
 }
