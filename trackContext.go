@@ -160,7 +160,7 @@ func (receiver *TraceContext) printLog() {
 		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.ConsumerContext.ConsumerQueueName, logs)
 		case eumTraceType.Task, eumTraceType.FSchedule:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TaskContext.TaskName, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s %s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TaskContext.TaskName, receiver.TaskContext.TaskGroupName, logs)
 		default:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), logs)
 		}
