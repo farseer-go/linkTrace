@@ -26,10 +26,8 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
 	if traceId == "" {
 		traceId = parse.ToString(sonyflake.GenerateId())
-	}
-	// 默认从0层开始
-	if traceLevel > 0 {
-		traceLevel++
+	} else {
+		traceLevel++ // 来自上游的请求，自动+1层
 	}
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
