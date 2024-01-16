@@ -9,6 +9,7 @@ const (
 	FSchedule                 // 调度中心
 	Task                      // 本地任务
 	WatchKey                  // ETCD
+	EventConsumer             // 事件消费
 )
 
 func (e Enum) ToString() string {
@@ -25,6 +26,8 @@ func (e Enum) ToString() string {
 		return "Task"
 	case WatchKey:
 		return "WatchKey"
+	case EventConsumer:
+		return "EventConsumer"
 	}
 	return ""
 }

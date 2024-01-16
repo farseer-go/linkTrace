@@ -157,7 +157,7 @@ func (receiver *TraceContext) printLog() {
 		switch receiver.TraceType {
 		case eumTraceType.WebApi:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.WebContext.WebPath, logs)
-		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer:
+		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer, eumTraceType.EventConsumer:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.ConsumerContext.ConsumerQueueName, logs)
 		case eumTraceType.Task, eumTraceType.FSchedule:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s %s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TaskContext.TaskName, receiver.TaskContext.TaskGroupName, logs)

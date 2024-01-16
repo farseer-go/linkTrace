@@ -87,8 +87,37 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.I
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		ConsumerContext: ConsumerContext{
-			ConsumerServer:    fmt.Sprintf("%s/%s/%v", core.AppName, core.AppIp, core.AppId),
+			ConsumerServer:    fmt.Sprintf("本地Queue/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
 			ConsumerQueueName: queueName + "/" + subscribeName,
+		},
+	}
+	trace.CurTraceContext.Set(context)
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
+	return context
+}
+
+// EntryEventConsumer event 事件消费埋点
+func (receiver *traceManager) EntryEventConsumer(eventName, subscribeName string) trace.ITraceContext {
+	// 事件消费，一般是由其它入口的程序触发的，所以这里先看能不能取到之前的上下文
+	var traceId string
+	var parentAppName string
+	if cur := receiver.GetCurTrace(); cur != nil {
+		traceId = cur.GetTraceId()
+		parentAppName = core.AppName
+	} else {
+		traceId = parse.ToString(sonyflake.GenerateId())
+	}
+	context := &TraceContext{
+		AppId:         parse.ToString(core.AppId),
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
+		ParentAppName: parentAppName,
+		TraceId:       traceId,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.EventConsumer,
+		ConsumerContext: ConsumerContext{
+			ConsumerServer:    fmt.Sprintf("本地Event/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
+			ConsumerQueueName: eventName + "/" + subscribeName,
 		},
 	}
 	trace.CurTraceContext.Set(context)
@@ -228,6 +257,16 @@ func (*traceManager) TraceHand(name string) trace.ITraceDetail {
 	detail := &TraceDetailHand{
 		BaseTraceDetail: newTraceDetail(eumCallType.Hand, ""),
 		Name:            name,
+	}
+	add(detail)
+	return detail
+}
+
+// TraceEventPublish 事件发布
+func (*traceManager) TraceEventPublish(eventName string) trace.ITraceDetail {
+	detail := &TraceDetailEventConsumer{
+		BaseTraceDetail: newTraceDetail(eumCallType.EventPublish, ""),
+		Name:            eventName,
 	}
 	add(detail)
 	return detail
