@@ -101,9 +101,12 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 	// 事件消费，一般是由其它入口的程序触发的，所以这里先看能不能取到之前的上下文
 	var traceId string
 	var parentAppName string
+	var traceLevel int
+
 	if cur := receiver.GetCurTrace(); cur != nil {
 		traceId = cur.GetTraceId()
 		parentAppName = core.AppName
+		traceLevel = cur.GetTraceLevel() + 1
 	} else {
 		traceId = parse.ToString(sonyflake.GenerateId())
 	}
@@ -115,6 +118,7 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.EventConsumer,
+		TraceLevel:    traceLevel,
 		ConsumerContext: ConsumerContext{
 			ConsumerServer:    server,
 			ConsumerQueueName: eventName + "/" + subscribeName,
