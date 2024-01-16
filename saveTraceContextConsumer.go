@@ -22,8 +22,9 @@ var FopsServer string
 func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListAny, remainingCount int) {
 	// 控制3秒执行一次
 	<-time.After(3 * time.Second)
-
-	trace.CurTraceContext.Get().Ignore()
+	if traceContext := trace.CurTraceContext.Get(); traceContext != nil {
+		traceContext.Ignore()
+	}
 	lstTraceContext := collections.NewList[TraceContext]()
 	lstMessage.Foreach(func(item *any) {
 		// 上下文
