@@ -96,6 +96,9 @@ func (receiver *TraceContext) GetStartTs() int64 {
 
 // End 结束当前链路
 func (receiver *TraceContext) End() {
+	// 清空当前上下文
+	trace.CurTraceContext.Remove()
+
 	if receiver.ignore {
 		return
 	}
@@ -118,6 +121,7 @@ func (receiver *TraceContext) End() {
 	// 打印日志
 	receiver.printLog()
 }
+
 func (receiver *TraceContext) Ignore() {
 	receiver.ignore = true
 }
