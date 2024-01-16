@@ -97,7 +97,7 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.I
 }
 
 // EntryEventConsumer event 事件消费埋点
-func (receiver *traceManager) EntryEventConsumer(eventName, subscribeName string) trace.ITraceContext {
+func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeName string) trace.ITraceContext {
 	// 事件消费，一般是由其它入口的程序触发的，所以这里先看能不能取到之前的上下文
 	var traceId string
 	var parentAppName string
@@ -116,7 +116,7 @@ func (receiver *traceManager) EntryEventConsumer(eventName, subscribeName string
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.EventConsumer,
 		ConsumerContext: ConsumerContext{
-			ConsumerServer:    fmt.Sprintf("本地Event/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
+			ConsumerServer:    server,
 			ConsumerQueueName: eventName + "/" + subscribeName,
 		},
 	}
