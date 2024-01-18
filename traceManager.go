@@ -365,6 +365,8 @@ func add(traceDetail trace.ITraceDetail) {
 			detail.UnTraceTs = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
 		}
 		detail.TraceId, detail.AppName, detail.AppId, detail.AppIp, detail.ParentAppName = t.GetAppInfo()
+
+		detail.Comment = trace.DetailComment.Get()
 		t.AddDetail(traceDetail)
 	}
 }
