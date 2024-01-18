@@ -347,6 +347,7 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 		CallType:       callType,
 		StartTs:        time.Now().UnixMicro(),
 		EndTs:          time.Now().UnixMicro(),
+		Comment:        trace.GetComment(),
 	}
 	// 加入到当前层级列表
 	trace.ScopeLevel.Set(append(lstScope, baseTraceDetail))
@@ -365,8 +366,6 @@ func add(traceDetail trace.ITraceDetail) {
 			detail.UnTraceTs = time.Duration(detail.StartTs-t.GetStartTs()) * time.Microsecond
 		}
 		detail.TraceId, detail.AppName, detail.AppId, detail.AppIp, detail.ParentAppName = t.GetAppInfo()
-
-		detail.Comment = trace.DetailComment.Get()
 		t.AddDetail(traceDetail)
 	}
 }
