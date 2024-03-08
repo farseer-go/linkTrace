@@ -26,6 +26,7 @@ type TraceContext struct {
 	UseDesc       string                // 总共使用时间（描述）
 	TraceType     eumTraceType.Enum     // 状态码
 	List          []any                 // 调用的上下文trace.ITraceDetail
+	TraceCount    int                   // 追踪明细数量
 	ignore        bool                  // 忽略这次的链路追踪
 	Exception     *trace.ExceptionStack // 异常信息
 	WebContext
