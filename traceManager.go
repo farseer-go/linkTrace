@@ -77,13 +77,12 @@ func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey
 
 // EntryQueueConsumer queue 消费埋点
 func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.ITraceContext {
-	traceId := parse.ToString(sonyflake.GenerateId())
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
-		TraceId:       traceId,
+		TraceId:       parse.ToString(sonyflake.GenerateId()),
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		ConsumerContext: ConsumerContext{
