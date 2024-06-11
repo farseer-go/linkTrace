@@ -19,6 +19,13 @@ func (*traceManager) GetCurTrace() trace.ITraceContext {
 	return trace.CurTraceContext.Get()
 }
 
+func (*traceManager) GetTraceId() string {
+	if traceContext := trace.CurTraceContext.Get(); traceContext != nil {
+		return traceContext.GetTraceId()
+	}
+	return ""
+}
+
 // EntryWebApi Webapi入口
 func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestBody string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
@@ -54,14 +61,16 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 }
 
 // EntryMqConsumer mq 消费埋点
-func (*traceManager) EntryMqConsumer(server string, queueName string, routingKey string) trace.ITraceContext {
-	traceId := parse.ToString(sonyflake.GenerateId())
+func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string, queueName string, routingKey string) trace.ITraceContext {
+	if parentTraceId == "" {
+		parentTraceId = parse.ToString(sonyflake.GenerateId())
+	}
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
-		ParentAppName: "",
-		TraceId:       traceId,
+		ParentAppName: parentAppName,
+		TraceId:       parentTraceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
 		ConsumerContext: ConsumerContext{
