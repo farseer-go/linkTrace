@@ -2,6 +2,7 @@ package linkTrace
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"github.com/farseer-go/collections"
@@ -51,7 +52,13 @@ func uploadTrace(lstTraceContext any) error {
 		newRequest.Header.Set("Trace-Level", parse.ToString(traceContext.GetTraceLevel()))
 		newRequest.Header.Set("Trace-App-Name", core.AppName)
 	}
-	client := &http.Client{}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, // 不验证 HTTPS 证书
+			},
+		},
+	}
 	rsp, err := client.Do(newRequest)
 	if err != nil {
 		return fmt.Errorf("上传链路记录到FOPS失败：%s", err.Error())
