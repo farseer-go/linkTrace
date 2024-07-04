@@ -32,8 +32,6 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	if err := uploadTrace(lstTraceContext); err != nil {
 		exception.ThrowRefuseException(err.Error())
 	}
-
-	return
 }
 
 type UploadTraceRequest struct {
