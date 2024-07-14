@@ -12,6 +12,7 @@ import (
 	"github.com/farseer-go/fs/exception"
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
+	"github.com/farseer-go/linkTrace/eumTraceType"
 	"net/http"
 )
 
@@ -27,6 +28,9 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	lstMessage.Foreach(func(item *any) {
 		// 上下文
 		dto := (*item).(TraceContext)
+		if len(dto.List) == 0 && dto.TraceType != eumTraceType.WebApi {
+			return
+		}
 		lstTraceContext.Add(dto)
 	})
 	if err := uploadTrace(lstTraceContext); err != nil {
