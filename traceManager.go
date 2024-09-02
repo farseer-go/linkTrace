@@ -27,7 +27,7 @@ func (*traceManager) GetTraceId() string {
 }
 
 // EntryWebApi Webapi入口
-func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestBody string, requestIp string) trace.ITraceContext {
+func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
 	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
 	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
@@ -51,7 +51,41 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 			WebMethod:      method,
 			WebContentType: contentType,
 			WebHeaders:     headerDictionary.ToDictionary(),
-			WebRequestBody: requestBody,
+			WebRequestBody: "",
+			WebRequestIp:   requestIp,
+		},
+	}
+	trace.CurTraceContext.Set(context)
+	trace.ScopeLevel.Set([]trace.BaseTraceDetail{})
+	return context
+}
+
+// EntryWebSocket WebSocket入口
+func (*traceManager) EntryWebSocket(domain string, path string, method string, contentType string, header map[string]string, requestIp string) trace.ITraceContext {
+	headerDictionary := collections.NewDictionaryFromMap(header)
+	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
+	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
+	if traceId == "" {
+		traceId = parse.ToString(sonyflake.GenerateId())
+	} else {
+		traceLevel++ // 来自上游的请求，自动+1层
+	}
+	context := &TraceContext{
+		AppId:         parse.ToString(core.AppId),
+		AppName:       core.AppName,
+		AppIp:         core.AppIp,
+		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
+		TraceId:       traceId,
+		TraceLevel:    traceLevel,
+		StartTs:       time.Now().UnixMicro(),
+		TraceType:     eumTraceType.WebSocket,
+		WebContext: WebContext{
+			WebDomain:      domain,
+			WebPath:        path,
+			WebMethod:      method,
+			WebContentType: contentType,
+			WebHeaders:     headerDictionary.ToDictionary(),
+			WebRequestBody: "Conn",
 			WebRequestIp:   requestIp,
 		},
 	}
