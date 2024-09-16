@@ -87,6 +87,10 @@ func (receiver *TraceContext) SetBody(requestBody string, statusCode int, respon
 	receiver.WebContext.WebResponseBody = responseBody
 }
 
+func (receiver *TraceContext) SetResponseBody(responseBody string) {
+	receiver.WebContext.WebResponseBody = responseBody
+}
+
 func (receiver *TraceContext) GetTraceId() string {
 	return receiver.TraceId
 }
