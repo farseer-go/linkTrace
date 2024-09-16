@@ -96,7 +96,7 @@ func (receiver *TraceContext) GetStartTs() int64 {
 }
 
 // End 结束当前链路
-func (receiver *TraceContext) End() {
+func (receiver *TraceContext) End(err error) {
 	// 清空当前上下文
 	trace.CurTraceContext.Remove()
 

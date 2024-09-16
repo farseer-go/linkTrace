@@ -61,7 +61,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 }
 
 // EntryWebSocket WebSocket入口
-func (*traceManager) EntryWebSocket(domain string, path string, method string, contentType string, header map[string]string, requestIp string) trace.ITraceContext {
+func (*traceManager) EntryWebSocket(domain string, path string, contentType string, header map[string]string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
 	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
 	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
@@ -82,7 +82,7 @@ func (*traceManager) EntryWebSocket(domain string, path string, method string, c
 		WebContext: WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
-			WebMethod:      method,
+			WebMethod:      "WEBSOCKET",
 			WebContentType: contentType,
 			WebHeaders:     headerDictionary.ToDictionary(),
 			WebRequestBody: "Conn",
