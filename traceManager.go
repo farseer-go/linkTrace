@@ -2,6 +2,8 @@ package linkTrace
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/parse"
@@ -9,7 +11,6 @@ import (
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/fs/trace/eumCallType"
 	"github.com/farseer-go/linkTrace/eumTraceType"
-	"time"
 )
 
 type traceManager struct {
@@ -63,10 +64,10 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 // EntryWebSocket WebSocket入口
 func (*traceManager) EntryWebSocket(domain string, path string, header map[string]string, requestIp string) trace.ITraceContext {
 	headerDictionary := collections.NewDictionaryFromMap(header)
-	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
+	parentTraceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
 	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
-	if traceId == "" {
-		traceId = parse.ToString(sonyflake.GenerateId())
+	if parentTraceId == "" {
+		parentTraceId = parse.ToString(sonyflake.GenerateId())
 	} else {
 		traceLevel++ // 来自上游的请求，自动+1层
 	}
@@ -75,7 +76,7 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
-		TraceId:       traceId,
+		TraceId:       parentTraceId,
 		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebSocket,
@@ -96,8 +97,12 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 
 // EntryMqConsumer mq 消费埋点
 func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string, queueName string, routingKey string) trace.ITraceContext {
+	// 如果来自上游，则要自动+1层，默认为0
+	var traceLevel int
 	if parentTraceId == "" {
 		parentTraceId = parse.ToString(sonyflake.GenerateId())
+	} else {
+		traceLevel++ // 来自上游的请求，自动+1层
 	}
 	context := &TraceContext{
 		AppId:         parse.ToString(core.AppId),
@@ -105,6 +110,7 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 		AppIp:         core.AppIp,
 		ParentAppName: parentAppName,
 		TraceId:       parentTraceId,
+		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
 		ConsumerContext: ConsumerContext{
