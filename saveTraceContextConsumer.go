@@ -3,8 +3,10 @@ package linkTrace
 import (
 	"bytes"
 	"crypto/tls"
-	"encoding/json"
 	"fmt"
+	"net/http"
+
+	"github.com/bytedance/sonic"
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/container"
@@ -13,7 +15,6 @@ import (
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
-	"net/http"
 )
 
 // FopsServer fops地址
@@ -44,7 +45,7 @@ type UploadTraceRequest struct {
 
 // UploadTrace 上传链路记录
 func uploadTrace(lstTraceContext any) error {
-	bodyByte, _ := json.Marshal(UploadTraceRequest{List: lstTraceContext})
+	bodyByte, _ := sonic.Marshal(UploadTraceRequest{List: lstTraceContext})
 	url := configure.GetFopsServer() + "linkTrace/upload"
 	newRequest, _ := http.NewRequest("POST", url, bytes.NewReader(bodyByte))
 	newRequest.Header.Set("Content-Type", "application/json")
