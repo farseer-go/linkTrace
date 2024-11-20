@@ -2,6 +2,9 @@ package linkTrace
 
 import (
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/flog"
@@ -9,8 +12,6 @@ import (
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 	"github.com/farseer-go/queue"
-	"strings"
-	"time"
 )
 
 type TraceContext struct {
@@ -165,13 +166,13 @@ func (receiver *TraceContext) printLog() {
 		logs := strings.Join(lst.ToArray(), "\n")
 		switch receiver.TraceType {
 		case eumTraceType.WebApi:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.WebContext.WebPath, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(receiver.TraceId), flog.Red(receiver.UseTs.String()), receiver.WebContext.WebPath, logs)
 		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer, eumTraceType.EventConsumer:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.ConsumerContext.ConsumerQueueName, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", receiver.TraceType.ToString(), flog.Green(receiver.TraceId), flog.Red(receiver.UseTs.String()), receiver.ConsumerContext.ConsumerQueueName, logs)
 		case eumTraceType.Task, eumTraceType.FSchedule:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s %s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), receiver.TaskContext.TaskName, receiver.TaskContext.TaskGroupName, logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s %s\n%s\n", receiver.TraceType.ToString(), flog.Green(receiver.TraceId), flog.Red(receiver.UseTs.String()), receiver.TaskContext.TaskName, receiver.TaskContext.TaskGroupName, logs)
 		default:
-			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s\n%s\n", receiver.TraceType.ToString(), flog.Green(parse.ToString(receiver.TraceId)), flog.Red(receiver.UseTs.String()), logs)
+			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s\n%s\n", receiver.TraceType.ToString(), flog.Green(receiver.TraceId), flog.Red(receiver.UseTs.String()), logs)
 		}
 	}
 }
@@ -187,5 +188,5 @@ func (receiver *TraceContext) Error(err error) {
 }
 
 func (receiver *TraceContext) GetAppInfo() (string, string, string, string, string) {
-	return parse.ToString(receiver.TraceId), receiver.AppName, parse.ToString(receiver.AppId), receiver.AppIp, receiver.ParentAppName
+	return receiver.TraceId, receiver.AppName, parse.ToString(receiver.AppId), receiver.AppIp, receiver.ParentAppName
 }

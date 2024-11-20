@@ -2,6 +2,7 @@ package linkTrace
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/farseer-go/collections"
@@ -33,12 +34,12 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
 	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
 	if traceId == "" {
-		traceId = parse.ToString(sonyflake.GenerateId())
+		traceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
 	} else {
 		traceLevel++ // 来自上游的请求，自动+1层
 	}
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
@@ -67,12 +68,12 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 	parentTraceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
 	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
 	if parentTraceId == "" {
-		parentTraceId = parse.ToString(sonyflake.GenerateId())
+		parentTraceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
 	} else {
 		traceLevel++ // 来自上游的请求，自动+1层
 	}
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
@@ -100,12 +101,12 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 	// 如果来自上游，则要自动+1层，默认为0
 	var traceLevel int
 	if parentTraceId == "" {
-		parentTraceId = parse.ToString(sonyflake.GenerateId())
+		parentTraceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
 	} else {
 		traceLevel++ // 来自上游的请求，自动+1层
 	}
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: parentAppName,
@@ -127,11 +128,11 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 // EntryQueueConsumer queue 消费埋点
 func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.ITraceContext {
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
-		TraceId:       parse.ToString(sonyflake.GenerateId()),
+		TraceId:       strconv.FormatInt(sonyflake.GenerateId(), 10),
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		ConsumerContext: ConsumerContext{
@@ -154,10 +155,10 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 		traceId = cur.GetTraceId()
 		traceLevel = cur.GetTraceLevel() + 1
 	} else {
-		traceId = parse.ToString(sonyflake.GenerateId())
+		traceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
 	}
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -177,9 +178,9 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 
 // EntryTask 创建本地任务入口
 func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
-	traceId := parse.ToString(sonyflake.GenerateId())
+	traceId := strconv.FormatInt(sonyflake.GenerateId(), 10)
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -197,13 +198,13 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 
 // EntryTaskGroup 创建本地任务入口（调度中心专用）
 func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskId int64) trace.ITraceContext {
-	traceId := parse.ToString(sonyflake.GenerateId())
+	traceId := strconv.FormatInt(sonyflake.GenerateId(), 10)
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
-		TraceId:       parse.ToString(traceId),
+		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		TaskContext: TaskContext{
@@ -219,9 +220,9 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 
 // EntryFSchedule 创建调度中心入口
 func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map[string]string) trace.ITraceContext {
-	traceId := parse.ToString(sonyflake.GenerateId())
+	traceId := strconv.FormatInt(sonyflake.GenerateId(), 10)
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -242,9 +243,9 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 
 // EntryWatchKey 创建etcd入口
 func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
-	traceId := parse.ToString(sonyflake.GenerateId())
+	traceId := strconv.FormatInt(sonyflake.GenerateId(), 10)
 	context := &TraceContext{
-		AppId:         parse.ToString(core.AppId),
+		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
 		ParentAppName: "",
@@ -386,7 +387,7 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 		parentDetailId = lstScope[len(lstScope)-1].DetailId
 	}
 	baseTraceDetail := trace.BaseTraceDetail{
-		DetailId:       parse.ToString(sonyflake.GenerateId()),
+		DetailId:       strconv.FormatInt(sonyflake.GenerateId(), 10),
 		Level:          len(lstScope) + 1,
 		ParentDetailId: parentDetailId,
 		MethodName:     methodName,

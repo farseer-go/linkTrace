@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/bytedance/sonic"
 	"github.com/farseer-go/collections"
@@ -12,7 +13,6 @@ import (
 	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/exception"
-	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 )
@@ -51,8 +51,8 @@ func uploadTrace(lstTraceContext any) error {
 	newRequest.Header.Set("Content-Type", "application/json")
 	// 链路追踪
 	if traceContext := container.Resolve[trace.IManager]().GetCurTrace(); traceContext != nil {
-		newRequest.Header.Set("Trace-Id", parse.ToString(traceContext.GetTraceId()))
-		newRequest.Header.Set("Trace-Level", parse.ToString(traceContext.GetTraceLevel()))
+		newRequest.Header.Set("Trace-Id", traceContext.GetTraceId())
+		newRequest.Header.Set("Trace-Level", strconv.Itoa(traceContext.GetTraceLevel()))
 		newRequest.Header.Set("Trace-App-Name", core.AppName)
 	}
 	client := &http.Client{
