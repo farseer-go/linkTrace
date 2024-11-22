@@ -8,7 +8,6 @@ import (
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/flog"
-	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 	"github.com/farseer-go/queue"
@@ -188,5 +187,5 @@ func (receiver *TraceContext) Error(err error) {
 }
 
 func (receiver *TraceContext) GetAppInfo() (string, string, string, string, string) {
-	return receiver.TraceId, receiver.AppName, parse.ToString(receiver.AppId), receiver.AppIp, receiver.ParentAppName
+	return receiver.TraceId, receiver.AppName, receiver.AppId, receiver.AppIp, receiver.ParentAppName
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/exception"
+	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 )
@@ -31,6 +32,22 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 		dto := (*item).(TraceContext)
 		if len(dto.List) == 0 && dto.TraceType != eumTraceType.WebApi {
 			return
+		}
+		dto.printLog()
+
+		// 链路超过200条，则丢弃
+		if len(dto.List) > 200 {
+			dto.List = dto.List[0:200]
+			switch dto.TraceType {
+			case eumTraceType.WebApi:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()), dto.WebContext.WebPath)
+			case eumTraceType.MqConsumer, eumTraceType.QueueConsumer, eumTraceType.EventConsumer:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()), dto.ConsumerContext.ConsumerQueueName)
+			case eumTraceType.Task, eumTraceType.FSchedule:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s %s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()), dto.TaskContext.TaskName, dto.TaskContext.TaskGroupName)
+			default:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()))
+			}
 		}
 		lstTraceContext.Add(dto)
 	})
