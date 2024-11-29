@@ -7,13 +7,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/bytedance/sonic"
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/exception"
 	"github.com/farseer-go/fs/flog"
+	"github.com/farseer-go/fs/snc"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/linkTrace/eumTraceType"
 )
@@ -62,7 +62,7 @@ type UploadTraceRequest struct {
 
 // UploadTrace 上传链路记录
 func uploadTrace(lstTraceContext any) error {
-	bodyByte, _ := sonic.Marshal(UploadTraceRequest{List: lstTraceContext})
+	bodyByte, _ := snc.Marshal(UploadTraceRequest{List: lstTraceContext})
 	url := configure.GetFopsServer() + "linkTrace/upload"
 	newRequest, _ := http.NewRequest("POST", url, bytes.NewReader(bodyByte))
 	newRequest.Header.Set("Content-Type", "application/json")
