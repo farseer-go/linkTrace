@@ -33,7 +33,7 @@ type TraceContext struct {
 	ConsumerContext
 	TaskContext
 	WatchKeyContext
-	CreateAt dateTime.DateTime // 请求时间
+	CreateAt dateTime.DateTime `json:"ca"` // 请求时间
 }
 
 type WebContext struct {
