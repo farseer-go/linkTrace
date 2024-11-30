@@ -1,13 +1,14 @@
 package linkTrace
 
 import (
+	"strings"
+	"time"
+
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/modules"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/queue"
-	"strings"
-	"time"
 )
 
 // Enable 是否启用
@@ -38,6 +39,6 @@ func (module Module) PreInitialize() {
 		if !strings.HasSuffix(FopsServer, "/") {
 			FopsServer += "/"
 		}
-		queue.Subscribe("TraceContext", "SaveTraceContext", 1000,5*time.Second, SaveTraceContextConsumer)
+		queue.Subscribe("TraceContext", "SaveTraceContext", 1000, 5*time.Second, SaveTraceContextConsumer)
 	}
 }

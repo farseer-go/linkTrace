@@ -9,13 +9,12 @@ import (
 
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/configure"
-	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/exception"
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/snc"
 	"github.com/farseer-go/fs/trace"
-	"github.com/farseer-go/linkTrace/eumTraceType"
+	"github.com/farseer-go/fs/trace/eumTraceType"
 )
 
 // FopsServer fops地址
@@ -26,14 +25,13 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	if traceContext := trace.CurTraceContext.Get(); traceContext != nil {
 		traceContext.Ignore()
 	}
-	lstTraceContext := collections.NewList[TraceContext]()
+	lstTraceContext := collections.NewList[*trace.TraceContext]()
 	lstMessage.Foreach(func(item *any) {
 		// 上下文
-		dto := (*item).(TraceContext)
+		dto := (*item).(*trace.TraceContext)
 		if len(dto.List) == 0 && dto.TraceType != eumTraceType.WebApi {
 			return
 		}
-		dto.printLog()
 
 		// 链路超过200条，则丢弃
 		if len(dto.List) > 200 {
@@ -61,15 +59,16 @@ type UploadTraceRequest struct {
 }
 
 // UploadTrace 上传链路记录
-func uploadTrace(lstTraceContext any) error {
+func uploadTrace(lstTraceContext collections.List[*trace.TraceContext]) error {
 	bodyByte, _ := snc.Marshal(UploadTraceRequest{List: lstTraceContext})
 	url := configure.GetFopsServer() + "linkTrace/upload"
 	newRequest, _ := http.NewRequest("POST", url, bytes.NewReader(bodyByte))
 	newRequest.Header.Set("Content-Type", "application/json")
+
 	// 链路追踪
-	if traceContext := container.Resolve[trace.IManager]().GetCurTrace(); traceContext != nil {
-		newRequest.Header.Set("Trace-Id", traceContext.GetTraceId())
-		newRequest.Header.Set("Trace-Level", strconv.Itoa(traceContext.GetTraceLevel()))
+	if traceContext := trace.CurTraceContext.Get(); traceContext != nil {
+		newRequest.Header.Set("Trace-Id", traceContext.TraceId)
+		newRequest.Header.Set("Trace-Level", strconv.Itoa(traceContext.TraceLevel))
 		newRequest.Header.Set("Trace-App-Name", core.AppName)
 	}
 	client := &http.Client{
