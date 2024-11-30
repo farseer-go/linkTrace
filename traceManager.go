@@ -308,7 +308,7 @@ func (*traceManager) TraceEtcd(method string, key string, leaseID int64) trace.I
 
 // TraceHand 手动埋点
 func (*traceManager) TraceHand(name string) trace.ITraceDetail {
-	detail := &TraceDetailHand{
+	detail := &trace.TraceDetailHand{
 		BaseTraceDetail: trace.NewTraceDetail(eumCallType.Hand, ""),
 		Name:            name,
 	}
