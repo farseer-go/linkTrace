@@ -14,21 +14,21 @@ import (
 )
 
 type TraceContext struct {
-	TraceId       string                // 上下文ID
-	AppId         string                // 应用ID
-	AppName       string                // 应用名称
-	AppIp         string                // 应用IP
-	ParentAppName string                // 上游应用
-	TraceLevel    int                   // 逐层递增（显示上下游顺序）
-	StartTs       int64                 // 调用开始时间戳（微秒）
-	EndTs         int64                 // 调用结束时间戳（微秒）
-	UseTs         time.Duration         // 总共使用时间（微秒）
-	UseDesc       string                // 总共使用时间（描述）
-	TraceType     eumTraceType.Enum     // 状态码
-	List          []any                 // 调用的上下文trace.ITraceDetail
-	TraceCount    int                   // 追踪明细数量
+	TraceId       string                `json:"tid"` // 上下文ID
+	AppId         string                `json:"aid"` // 应用ID
+	AppName       string                `json:"an"`  // 应用名称
+	AppIp         string                `json:"aip"` // 应用IP
+	ParentAppName string                `json:"pn"`  // 上游应用
+	TraceLevel    int                   `json:"tl"`  // 逐层递增（显示上下游顺序）
+	StartTs       int64                 `json:"st"`  // 调用开始时间戳（微秒）
+	EndTs         int64                 `json:"et"`  // 调用结束时间戳（微秒）
+	UseTs         time.Duration         `json:"ut"`  // 总共使用时间（微秒）
+	UseDesc       string                `json:"ud"`  // 总共使用时间（描述）
+	TraceType     eumTraceType.Enum     `json:"tt"`  // 状态码
+	List          []any                 `json:"l"`   // 调用的上下文trace.ITraceDetail
+	TraceCount    int                   `json:"tc"`  // 追踪明细数量
 	ignore        bool                  // 忽略这次的链路追踪
-	Exception     *trace.ExceptionStack // 异常信息
+	Exception     *trace.ExceptionStack `json:"e"` // 异常信息
 	WebContext
 	ConsumerContext
 	TaskContext
@@ -37,15 +37,15 @@ type TraceContext struct {
 }
 
 type WebContext struct {
-	WebDomain       string                                 // 请求域名
-	WebPath         string                                 // 请求地址
-	WebMethod       string                                 // 请求方式
-	WebContentType  string                                 // 请求内容类型
-	WebStatusCode   int                                    // 状态码
-	WebHeaders      collections.Dictionary[string, string] // 请求头部
-	WebRequestBody  string                                 // 请求参数
-	WebResponseBody string                                 // 输出参数
-	WebRequestIp    string                                 // 客户端IP
+	WebDomain       string                                 `json:"wd"`  // 请求域名
+	WebPath         string                                 `json:"wp"`  // 请求地址
+	WebMethod       string                                 `json:"wm"`  // 请求方式
+	WebContentType  string                                 `json:"wct"` // 请求内容类型
+	WebStatusCode   int                                    `json:"wsc"` // 状态码
+	WebHeaders      collections.Dictionary[string, string] `json:"wh"`  // 请求头部
+	WebRequestBody  string                                 `json:"wrb"` // 请求参数
+	WebResponseBody string                                 `json:"wpb"` // 输出参数
+	WebRequestIp    string                                 `json:"wip"` // 客户端IP
 }
 
 func (receiver WebContext) IsNil() bool {
@@ -53,9 +53,9 @@ func (receiver WebContext) IsNil() bool {
 }
 
 type ConsumerContext struct {
-	ConsumerServer     string // MQ服务器
-	ConsumerQueueName  string // 队列名称
-	ConsumerRoutingKey string // 路由KEY
+	ConsumerServer     string `json:"cs"` // MQ服务器
+	ConsumerQueueName  string `json:"cq"` // 队列名称
+	ConsumerRoutingKey string `json:"cr"` // 路由KEY
 }
 
 func (receiver ConsumerContext) IsNil() bool {
@@ -63,10 +63,10 @@ func (receiver ConsumerContext) IsNil() bool {
 }
 
 type TaskContext struct {
-	TaskName      string                                 // 任务名称
-	TaskGroupName string                                 // 任务组ID
-	TaskId        int64                                  // 任务ID
-	TaskData      collections.Dictionary[string, string] // 任务数据
+	TaskName      string                                 `json:"tn"`  // 任务名称
+	TaskGroupName string                                 `json:"tgn"` // 任务组ID
+	TaskId        int64                                  `json:"tid"` // 任务ID
+	TaskData      collections.Dictionary[string, string] `json:"td"`  // 任务数据
 }
 
 func (receiver TaskContext) IsNil() bool {
@@ -74,7 +74,7 @@ func (receiver TaskContext) IsNil() bool {
 }
 
 type WatchKeyContext struct {
-	WatchKey string // KEY
+	WatchKey string `json:"wk"` // KEY
 }
 
 func (receiver WatchKeyContext) IsNil() bool {
@@ -109,6 +109,7 @@ func (receiver *TraceContext) End(err error) {
 	}
 	receiver.EndTs = time.Now().UnixMicro()
 	receiver.UseTs = time.Duration(receiver.EndTs-receiver.StartTs) * time.Microsecond
+	receiver.UseDesc = receiver.UseTs.String()
 	// 移除忽略的明细
 	var newList []any
 	for _, detail := range receiver.List {
@@ -117,6 +118,7 @@ func (receiver *TraceContext) End(err error) {
 		}
 	}
 	receiver.List = newList
+	receiver.TraceCount = len(newList)
 
 	// 启用了链路追踪后，把数据写入到本地队列中
 	if defConfig.Enable {
