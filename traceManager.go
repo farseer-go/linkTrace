@@ -7,6 +7,7 @@ import (
 
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/core"
+	"github.com/farseer-go/fs/dateTime"
 	"github.com/farseer-go/fs/parse"
 	"github.com/farseer-go/fs/sonyflake"
 	"github.com/farseer-go/fs/trace"
@@ -47,6 +48,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
+		CreateAt:      dateTime.Now(),
 		WebContext: WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
@@ -81,6 +83,7 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebSocket,
+		CreateAt:      dateTime.Now(),
 		WebContext: WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
@@ -114,6 +117,7 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
+		CreateAt:      dateTime.Now(),
 		ConsumerContext: ConsumerContext{
 			ConsumerServer:     server,
 			ConsumerQueueName:  queueName,
@@ -135,6 +139,7 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) trace.I
 		TraceId:       strconv.FormatInt(sonyflake.GenerateId(), 10),
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
+		CreateAt:      dateTime.Now(),
 		ConsumerContext: ConsumerContext{
 			ConsumerServer:    fmt.Sprintf("本地Queue/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
 			ConsumerQueueName: queueName + "/" + subscribeName,
@@ -167,6 +172,7 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.EventConsumer,
 		TraceLevel:    traceLevel,
+		CreateAt:      dateTime.Now(),
 		ConsumerContext: ConsumerContext{
 			ConsumerServer:    server,
 			ConsumerQueueName: eventName + "/" + subscribeName,
@@ -188,6 +194,7 @@ func (*traceManager) EntryTask(taskName string) trace.ITraceContext {
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
+		CreateAt:      dateTime.Now(),
 		TaskContext: TaskContext{
 			TaskName: taskName,
 		},
@@ -208,6 +215,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
+		CreateAt:      dateTime.Now(),
 		TaskContext: TaskContext{
 			TaskName:      fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
 			TaskGroupName: taskGroupName,
@@ -230,6 +238,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.FSchedule,
+		CreateAt:      dateTime.Now(),
 		TaskContext: TaskContext{
 			TaskName:      taskGroupName,
 			TaskGroupName: taskGroupName,
@@ -253,6 +262,7 @@ func (*traceManager) EntryWatchKey(key string) trace.ITraceContext {
 		TraceId:       traceId,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WatchKey,
+		CreateAt:      dateTime.Now(),
 		WatchKeyContext: WatchKeyContext{
 			WatchKey: key,
 		},
@@ -396,6 +406,7 @@ func newTraceDetail(callType eumCallType.Enum, methodName string) trace.BaseTrac
 		StartTs:        time.Now().UnixMicro(),
 		EndTs:          time.Now().UnixMicro(),
 		Comment:        trace.GetComment(),
+		CreateAt:       dateTime.Now(),
 	}
 	// 加入到当前层级列表
 	trace.ScopeLevel.Set(append(lstScope, baseTraceDetail))
