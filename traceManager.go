@@ -410,10 +410,18 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	traceContext.EndTs = time.Now().UnixMicro()
 	traceContext.UseTs = time.Duration(traceContext.EndTs-traceContext.StartTs) * time.Microsecond
 	traceContext.UseDesc = traceContext.UseTs.String()
+
+	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台
+	isError := traceContext.Exception != nil
+
 	// 移除忽略的明细
 	var newList []any
 	for _, detail := range traceContext.List {
-		if !detail.(trace.ITraceDetail).GetTraceDetail().IsIgnore() {
+		traceDetail := detail.(trace.ITraceDetail).GetTraceDetail()
+		if traceDetail.Exception != nil && !isError {
+			isError = true
+		}
+		if !traceDetail.IsIgnore() {
 			newList = append(newList, detail)
 		}
 	}
@@ -426,12 +434,13 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	}
 
 	// 打印日志
-	if defConfig.PrintLog {
+	if defConfig.PrintLog || isError {
 		lst := collections.NewList[string]()
 		for i := 0; i < len(traceContext.List); i++ {
-			tab := strings.Repeat("\t", traceContext.List[i].(trace.ITraceDetail).GetLevel()-1)
-			detail := traceContext.List[i].(trace.ITraceDetail).GetTraceDetail()
-			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), traceContext.List[i].(trace.ITraceDetail).ToString())
+			traceDetail := traceContext.List[i].(trace.ITraceDetail)
+			tab := strings.Repeat("\t", traceDetail.GetLevel()-1)
+			detail := traceDetail.GetTraceDetail()
+			log := fmt.Sprintf("%s%s (%s)：%s", tab, flog.Blue(i+1), flog.Green(detail.UnTraceTs.String()), traceDetail.ToString())
 			lst.Add(log)
 
 			if detail.Exception != nil && detail.Exception.ExceptionIsException {
