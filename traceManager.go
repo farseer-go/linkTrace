@@ -413,13 +413,18 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 
 	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台
 	isError := traceContext.Exception != nil
-
+	// 打印日志，供上传到FOPS
+	if isError {
+		flog.Errorf("%s %s:%d %s", traceContext.Exception.ExceptionCallFile, traceContext.Exception.ExceptionCallFuncName, traceContext.Exception.ExceptionCallLine, traceContext.Exception.ExceptionMessage)
+	}
 	// 移除忽略的明细
 	var newList []any
 	for _, detail := range traceContext.List {
 		traceDetail := detail.(trace.ITraceDetail).GetTraceDetail()
-		if traceDetail.Exception != nil && !isError {
+		// 打印日志，供上传到FOPS
+		if traceDetail.Exception != nil {
 			isError = true
+			flog.Errorf("%s %s:%d %s", traceDetail.Exception.ExceptionCallFile, traceDetail.Exception.ExceptionCallFuncName, traceDetail.Exception.ExceptionCallLine, traceDetail.Exception.ExceptionMessage)
 		}
 		if !traceDetail.IsIgnore() {
 			newList = append(newList, detail)
