@@ -439,7 +439,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	}
 
 	// 打印日志
-	if defConfig.PrintLog || isError {
+	if defConfig.PrintLog { //  || isError
 		lst := collections.NewList[string]()
 		for i := 0; i < len(traceContext.List); i++ {
 			traceDetail := traceContext.List[i].(trace.ITraceDetail)
@@ -460,7 +460,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 		lst.Add("-----------------------------------------------------------------")
 		logs := strings.Join(lst.ToArray(), "\n")
 		switch traceContext.TraceType {
-		case eumTraceType.WebApi:
+		case eumTraceType.WebApi, eumTraceType.WebSocket:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", traceContext.TraceType.ToString(), flog.Green(traceContext.TraceId), flog.Red(traceContext.UseTs.String()), traceContext.WebContext.WebPath, logs)
 		case eumTraceType.MqConsumer, eumTraceType.QueueConsumer, eumTraceType.EventConsumer:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s，%s\n%s\n", traceContext.TraceType.ToString(), flog.Green(traceContext.TraceId), flog.Red(traceContext.UseTs.String()), traceContext.ConsumerContext.ConsumerQueueName, logs)
