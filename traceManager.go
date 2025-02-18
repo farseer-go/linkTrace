@@ -411,12 +411,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	traceContext.UseTs = time.Duration(traceContext.EndTs-traceContext.StartTs) * time.Microsecond
 	traceContext.UseDesc = traceContext.UseTs.String()
 
-	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台
-	isError := traceContext.Exception != nil
-	// 打印日志，供上传到FOPS
-	if isError {
-		flog.Errorf("%s %s:%d %s", traceContext.Exception.ExceptionCallFile, traceContext.Exception.ExceptionCallFuncName, traceContext.Exception.ExceptionCallLine, traceContext.Exception.ExceptionMessage)
-	}
+	var isError bool
 	// 移除忽略的明细
 	var newList []any
 	for _, detail := range traceContext.List {
@@ -424,11 +419,17 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 		// 打印日志，供上传到FOPS
 		if traceDetail.Exception != nil {
 			isError = true
-			flog.Errorf("%s %s:%d %s", traceDetail.Exception.ExceptionCallFile, traceDetail.Exception.ExceptionCallFuncName, traceDetail.Exception.ExceptionCallLine, traceDetail.Exception.ExceptionMessage)
+			flog.Errorf("%s %s %s:%d %s", traceDetail.CallType.ToString(), traceDetail.Exception.ExceptionCallFile, traceDetail.Exception.ExceptionCallFuncName, traceDetail.Exception.ExceptionCallLine, traceDetail.Exception.ExceptionMessage)
 		}
 		if !traceDetail.IsIgnore() {
 			newList = append(newList, detail)
 		}
+	}
+
+	// 打印日志，供上传到FOPS
+	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台
+	if !isError && traceContext.Exception != nil {
+		flog.Errorf("%s %s %s:%d %s", traceContext.TraceType.ToString(), traceContext.Exception.ExceptionCallFile, traceContext.Exception.ExceptionCallFuncName, traceContext.Exception.ExceptionCallLine, traceContext.Exception.ExceptionMessage)
 	}
 	traceContext.List = newList
 	traceContext.TraceCount = len(newList)
