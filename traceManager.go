@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/farseer-go/collections"
@@ -382,14 +383,21 @@ func (*traceManager) TraceGrpc(method string, url string) trace.ITraceDetail {
 	return detail
 }
 
+// 添加明细时，需要用锁保护，防止并发追加链路明细时，同时操作同一个链路上下文
+var lock = &sync.RWMutex{}
+
 func add(traceDetail trace.ITraceDetail) {
+	lock.Lock()
+	defer lock.Unlock()
+
 	if t := trace.CurTraceContext.Get(); t != nil {
 		detail := traceDetail.GetTraceDetail()
 		// 时间轴：上下文入口起点时间到本次开始时间
 		detail.Timeline = time.Duration(detail.StartTs-t.StartTs) * time.Microsecond
-		details := t.List
-		if len(details) > 0 {
-			detail.UnTraceTs = time.Duration(detail.StartTs-details[len(details)-1].(trace.ITraceDetail).GetTraceDetail().EndTs) * time.Microsecond
+		if detailsLength := len(t.List); detailsLength > 0 {
+			if lastDetail := t.List[len(t.List)-1]; lastDetail != nil {
+				detail.UnTraceTs = time.Duration(detail.StartTs-lastDetail.(trace.ITraceDetail).GetTraceDetail().EndTs) * time.Microsecond
+			}
 		} else {
 			detail.UnTraceTs = time.Duration(detail.StartTs-t.StartTs) * time.Microsecond
 		}
