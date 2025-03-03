@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/farseer-go/collections"
+	"github.com/farseer-go/fs/color"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/exception"
@@ -29,22 +30,22 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	lstMessage.Foreach(func(item *any) {
 		// 上下文
 		dto := (*item).(*trace.TraceContext)
-		if len(dto.List) == 0 && dto.TraceType != eumTraceType.WebApi {
+		if !dto.List.Any() && dto.TraceType != eumTraceType.WebApi {
 			return
 		}
 
 		// 链路超过200条，则丢弃
-		if len(dto.List) > 200 {
-			dto.List = dto.List[0:200]
+		if dto.List.Count() > 200 {
+			dto.List = dto.List.Range(0, 200).ToList()
 			switch dto.TraceType {
 			case eumTraceType.WebApi:
-				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()), dto.WebContext.WebPath)
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), color.Green(dto.TraceId), color.Red(dto.UseTs.String()), dto.WebContext.WebPath)
 			case eumTraceType.MqConsumer, eumTraceType.QueueConsumer, eumTraceType.EventConsumer:
-				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()), dto.ConsumerContext.ConsumerQueueName)
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), color.Green(dto.TraceId), color.Red(dto.UseTs.String()), dto.ConsumerContext.ConsumerQueueName)
 			case eumTraceType.Task, eumTraceType.FSchedule:
-				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s %s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()), dto.TaskContext.TaskName, dto.TaskContext.TaskGroupName)
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s %s", dto.TraceType.ToString(), color.Green(dto.TraceId), color.Red(dto.UseTs.String()), dto.TaskContext.TaskName, dto.TaskContext.TaskGroupName)
 			default:
-				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s", dto.TraceType.ToString(), flog.Green(dto.TraceId), flog.Red(dto.UseTs.String()))
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s", dto.TraceType.ToString(), color.Green(dto.TraceId), color.Red(dto.UseTs.String()))
 			}
 		}
 		lstTraceContext.Add(dto)
