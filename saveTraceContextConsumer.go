@@ -50,8 +50,10 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 		}
 		lstTraceContext.Add(dto)
 	})
-	if err := uploadTrace(lstTraceContext); err != nil {
-		exception.ThrowRefuseException(err.Error())
+	if lstTraceContext.Count() > 0 {
+		if err := uploadTrace(lstTraceContext); err != nil {
+			exception.ThrowRefuseException(err.Error())
+		}
 	}
 }
 
