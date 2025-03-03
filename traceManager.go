@@ -276,8 +276,8 @@ func (*traceManager) TraceDatabase() trace.TraceDetail {
 // TraceDatabaseOpen 数据库埋点
 func (*traceManager) TraceDatabaseOpen(dbName string, connectString string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Database, "")
-	detail.TraceDetailDatabase.DbName = dbName
-	detail.TraceDetailDatabase.DbConnectionString = connectString
+	detail.DbName = dbName
+	detail.DbConnectionString = connectString
 	add(detail)
 	return detail
 }
@@ -285,8 +285,8 @@ func (*traceManager) TraceDatabaseOpen(dbName string, connectString string) trac
 // TraceElasticsearch Elasticsearch埋点
 func (*traceManager) TraceElasticsearch(method string, IndexName string, AliasesName string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Elasticsearch, method)
-	detail.TraceDetailEs.EsIndexName = IndexName
-	detail.TraceDetailEs.EsAliasesName = AliasesName
+	detail.EsIndexName = IndexName
+	detail.EsAliasesName = AliasesName
 	add(detail)
 	return detail
 }
@@ -294,8 +294,8 @@ func (*traceManager) TraceElasticsearch(method string, IndexName string, Aliases
 // TraceEtcd etcd埋点
 func (*traceManager) TraceEtcd(method string, key string, leaseID int64) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Etcd, method)
-	detail.TraceDetailEtcd.EtcdKey = key
-	detail.TraceDetailEtcd.EtcdLeaseID = leaseID
+	detail.EtcdKey = key
+	detail.EtcdLeaseID = leaseID
 	add(detail)
 	return detail
 }
@@ -303,7 +303,7 @@ func (*traceManager) TraceEtcd(method string, key string, leaseID int64) trace.T
 // TraceHand 手动埋点
 func (*traceManager) TraceHand(name string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Hand, "")
-	detail.TraceDetailHand.HandName = name
+	detail.HandName = name
 	add(detail)
 	return detail
 }
@@ -311,7 +311,7 @@ func (*traceManager) TraceHand(name string) trace.TraceDetail {
 // TraceEventPublish 事件发布
 func (*traceManager) TraceEventPublish(eventName string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.EventPublish, "")
-	detail.TraceDetailEvent.Name = eventName
+	detail.EventName = eventName
 	add(detail)
 	return detail
 }
@@ -319,9 +319,9 @@ func (*traceManager) TraceEventPublish(eventName string) trace.TraceDetail {
 // TraceMqSend mq发送埋点
 func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Mq, method)
-	detail.TraceDetailMq.MqServer = server
-	detail.TraceDetailMq.MqExchange = exchange
-	detail.TraceDetailMq.MqRoutingKey = routingKey
+	detail.MqServer = server
+	detail.MqExchange = exchange
+	detail.MqRoutingKey = routingKey
 	add(detail)
 	return detail
 }
@@ -329,8 +329,8 @@ func (*traceManager) TraceMqSend(method string, server string, exchange string, 
 // TraceMq open、create埋点
 func (*traceManager) TraceMq(method string, server string, exchange string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Mq, method)
-	detail.TraceDetailMq.MqServer = server
-	detail.TraceDetailMq.MqExchange = exchange
+	detail.MqServer = server
+	detail.MqExchange = exchange
 	add(detail)
 	return detail
 }
@@ -338,8 +338,8 @@ func (*traceManager) TraceMq(method string, server string, exchange string) trac
 // TraceRedis Redis埋点
 func (*traceManager) TraceRedis(method string, key string, field string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Redis, method)
-	detail.TraceDetailRedis.RedisKey = key
-	detail.TraceDetailRedis.RedisField = field
+	detail.RedisKey = key
+	detail.RedisField = field
 	add(detail)
 	return detail
 }
@@ -347,8 +347,8 @@ func (*traceManager) TraceRedis(method string, key string, field string) trace.T
 // TraceHttp http埋点
 func (*traceManager) TraceHttp(method string, url string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Http, method)
-	detail.TraceDetailHttp.HttpMethod = method
-	detail.TraceDetailHttp.HttpUrl = url
+	detail.HttpMethod = method
+	detail.HttpUrl = url
 	add(detail)
 	return detail
 }
@@ -356,8 +356,8 @@ func (*traceManager) TraceHttp(method string, url string) trace.TraceDetail {
 // TraceGrpc grpc埋点
 func (*traceManager) TraceGrpc(method string, url string) trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Grpc, method)
-	detail.TraceDetailGrpc.GrpcMethod = method
-	detail.TraceDetailGrpc.GrpcUrl = url
+	detail.GrpcMethod = method
+	detail.GrpcUrl = url
 	add(detail)
 	return detail
 }
