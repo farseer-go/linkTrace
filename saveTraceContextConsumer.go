@@ -56,7 +56,7 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 }
 
 type UploadTraceRequest struct {
-	List any
+	List collections.List[*trace.TraceContext]
 }
 
 // UploadTrace 上传链路记录
