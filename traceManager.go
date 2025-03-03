@@ -43,6 +43,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		WebContext: trace.WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
@@ -78,6 +79,7 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebSocket,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		WebContext: trace.WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
@@ -112,6 +114,7 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:     server,
 			ConsumerQueueName:  queueName,
@@ -134,6 +137,7 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) *trace.
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:    fmt.Sprintf("本地Queue/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
 			ConsumerQueueName: queueName + "/" + subscribeName,
@@ -167,6 +171,7 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 		TraceType:     eumTraceType.EventConsumer,
 		TraceLevel:    traceLevel,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:    server,
 			ConsumerQueueName: eventName + "/" + subscribeName,
@@ -189,6 +194,7 @@ func (*traceManager) EntryTask(taskName string) *trace.TraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		TaskContext: trace.TaskContext{
 			TaskName: taskName,
 		},
@@ -210,6 +216,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		TaskContext: trace.TaskContext{
 			TaskName:      fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
 			TaskGroupName: taskGroupName,
@@ -233,6 +240,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.FSchedule,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		TaskContext: trace.TaskContext{
 			TaskName:      taskGroupName,
 			TaskGroupName: taskGroupName,
@@ -257,6 +265,7 @@ func (*traceManager) EntryWatchKey(key string) *trace.TraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WatchKey,
 		CreateAt:      dateTime.Now(),
+		List:          collections.NewList[trace.TraceDetail](),
 		WatchKeyContext: trace.WatchKeyContext{
 			WatchKey: key,
 		},
@@ -377,7 +386,6 @@ func add(traceDetail trace.TraceDetail) {
 		} else {
 			traceDetail.UnTraceTs = time.Duration(traceDetail.StartTs-t.StartTs) * time.Microsecond
 		}
-		//traceDetail.TraceId, traceDetail.AppName, traceDetail.AppId, traceDetail.AppIp, traceDetail.ParentAppName = t.GetAppInfo()
 		t.AddDetail(traceDetail)
 	}
 }
