@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/farseer-go/collections"
@@ -43,7 +42,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		WebContext: trace.WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
@@ -55,7 +54,7 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -79,7 +78,7 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebSocket,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		WebContext: trace.WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
@@ -91,7 +90,7 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -114,7 +113,7 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:     server,
 			ConsumerQueueName:  queueName,
@@ -122,7 +121,7 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -137,14 +136,14 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) *trace.
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:    fmt.Sprintf("本地Queue/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
 			ConsumerQueueName: queueName + "/" + subscribeName,
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -171,14 +170,14 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 		TraceType:     eumTraceType.EventConsumer,
 		TraceLevel:    traceLevel,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:    server,
 			ConsumerQueueName: eventName + "/" + subscribeName,
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -194,13 +193,13 @@ func (*traceManager) EntryTask(taskName string) *trace.TraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		TaskContext: trace.TaskContext{
 			TaskName: taskName,
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -216,7 +215,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		TaskContext: trace.TaskContext{
 			TaskName:      fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
 			TaskGroupName: taskGroupName,
@@ -224,7 +223,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -240,7 +239,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.FSchedule,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		TaskContext: trace.TaskContext{
 			TaskName:      taskGroupName,
 			TaskGroupName: taskGroupName,
@@ -249,7 +248,7 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
@@ -265,129 +264,110 @@ func (*traceManager) EntryWatchKey(key string) *trace.TraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WatchKey,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[trace.TraceDetail](),
+		List:          collections.NewList[*trace.TraceDetail](),
 		WatchKeyContext: trace.WatchKeyContext{
 			WatchKey: key,
 		},
 	}
 	trace.CurTraceContext.Set(context)
-	trace.ScopeLevel.Set([]trace.TraceDetail{})
+	trace.ScopeLevel.Set([]*trace.TraceDetail{})
 	return context
 }
 
 // TraceDatabase 数据库埋点
-func (*traceManager) TraceDatabase() trace.TraceDetail {
+func (*traceManager) TraceDatabase() *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Database, "")
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceDatabaseOpen 数据库埋点
-func (*traceManager) TraceDatabaseOpen(dbName string, connectString string) trace.TraceDetail {
+func (*traceManager) TraceDatabaseOpen(dbName string, connectString string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Database, "")
 	detail.DbName = dbName
 	detail.DbConnectionString = connectString
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceElasticsearch Elasticsearch埋点
-func (*traceManager) TraceElasticsearch(method string, IndexName string, AliasesName string) trace.TraceDetail {
+func (*traceManager) TraceElasticsearch(method string, IndexName string, AliasesName string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Elasticsearch, method)
 	detail.EsIndexName = IndexName
 	detail.EsAliasesName = AliasesName
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceEtcd etcd埋点
-func (*traceManager) TraceEtcd(method string, key string, leaseID int64) trace.TraceDetail {
+func (*traceManager) TraceEtcd(method string, key string, leaseID int64) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Etcd, method)
 	detail.EtcdKey = key
 	detail.EtcdLeaseID = leaseID
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceHand 手动埋点
-func (*traceManager) TraceHand(name string) trace.TraceDetail {
+func (*traceManager) TraceHand(name string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Hand, "")
 	detail.HandName = name
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceEventPublish 事件发布
-func (*traceManager) TraceEventPublish(eventName string) trace.TraceDetail {
+func (*traceManager) TraceEventPublish(eventName string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.EventPublish, "")
 	detail.EventName = eventName
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceMqSend mq发送埋点
-func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) trace.TraceDetail {
+func (*traceManager) TraceMqSend(method string, server string, exchange string, routingKey string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Mq, method)
 	detail.MqServer = server
 	detail.MqExchange = exchange
 	detail.MqRoutingKey = routingKey
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceMq open、create埋点
-func (*traceManager) TraceMq(method string, server string, exchange string) trace.TraceDetail {
+func (*traceManager) TraceMq(method string, server string, exchange string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Mq, method)
 	detail.MqServer = server
 	detail.MqExchange = exchange
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceRedis Redis埋点
-func (*traceManager) TraceRedis(method string, key string, field string) trace.TraceDetail {
+func (*traceManager) TraceRedis(method string, key string, field string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Redis, method)
 	detail.RedisKey = key
 	detail.RedisField = field
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceHttp http埋点
-func (*traceManager) TraceHttp(method string, url string) trace.TraceDetail {
+func (*traceManager) TraceHttp(method string, url string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Http, method)
 	detail.HttpMethod = method
 	detail.HttpUrl = url
-	add(detail)
+	detail.Join()
 	return detail
 }
 
 // TraceGrpc grpc埋点
-func (*traceManager) TraceGrpc(method string, url string) trace.TraceDetail {
+func (*traceManager) TraceGrpc(method string, url string) *trace.TraceDetail {
 	detail := trace.NewTraceDetail(eumCallType.Grpc, method)
 	detail.GrpcMethod = method
 	detail.GrpcUrl = url
-	add(detail)
+	detail.Join()
 	return detail
-}
-
-// 添加明细时，需要用锁保护，防止并发追加链路明细时，同时操作同一个链路上下文
-var lock = &sync.RWMutex{}
-
-func add(traceDetail trace.TraceDetail) {
-	lock.Lock()
-	defer lock.Unlock()
-
-	if t := trace.CurTraceContext.Get(); t != nil {
-		// 时间轴：上下文入口起点时间到本次开始时间
-		traceDetail.Timeline = time.Duration(traceDetail.StartTs-t.StartTs) * time.Microsecond
-		if lastDetail := t.List.LastAddr(); lastDetail != nil {
-			traceDetail.UnTraceTs = time.Duration(traceDetail.StartTs-lastDetail.EndTs) * time.Microsecond
-		} else {
-			traceDetail.UnTraceTs = time.Duration(traceDetail.StartTs-t.StartTs) * time.Microsecond
-		}
-		t.AddDetail(traceDetail)
-	}
 }
 
 // End 结束当前链路
@@ -404,15 +384,16 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	traceContext.UseDesc = traceContext.UseTs.String()
 
 	// 移除忽略的明细
-	traceContext.List.RemoveAll(func(traceDetail trace.TraceDetail) bool {
+	traceContext.List.RemoveAll(func(traceDetail *trace.TraceDetail) bool {
 		return traceDetail.IsIgnore()
 	})
 
 	// 找到有异常的明细链路，打印日志，供上传到FOPS
-	traceContext.List.Where(func(item trace.TraceDetail) bool {
+	traceContext.List.Where(func(item *trace.TraceDetail) bool {
 		return item.Exception != nil
-	}).Foreach(func(traceDetail *trace.TraceDetail) {
-		flog.Errorf("%s %s %s:%d %s", traceDetail.CallType.ToString(), traceDetail.Exception.ExceptionCallFile, traceDetail.Exception.ExceptionCallFuncName, traceDetail.Exception.ExceptionCallLine, traceDetail.Exception.ExceptionMessage)
+	}).Foreach(func(traceDetail **trace.TraceDetail) {
+		detail := *traceDetail
+		flog.Errorf("%s %s %s:%d %s", detail.CallType.ToString(), detail.Exception.ExceptionCallFile, detail.Exception.ExceptionCallFuncName, detail.Exception.ExceptionCallLine, detail.Exception.ExceptionMessage)
 	})
 
 	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台，供上传到FOPS
@@ -429,13 +410,14 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	// 打印日志
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
-		traceContext.List.For(func(i int, traceDetail *trace.TraceDetail) {
-			tab := strings.Repeat("\t", traceDetail.Level-1)
-			log := fmt.Sprintf("%s%s (%s)：%s", tab, color.Blue(i+1), color.Green(traceDetail.UnTraceTs.String()), traceDetail.ToString())
+		traceContext.List.For(func(i int, traceDetail **trace.TraceDetail) {
+			detail := *traceDetail
+			tab := strings.Repeat("\t", detail.Level-1)
+			log := fmt.Sprintf("%s%s (%s)：%s", tab, color.Blue(i+1), color.Green(detail.UnTraceTs.String()), detail.ToString())
 			lst.Add(log)
 
-			if traceDetail.Exception != nil && traceDetail.Exception.ExceptionIsException {
-				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", traceDetail.Exception.ExceptionCallFile, color.Blue(traceDetail.Exception.ExceptionCallLine), color.Red(traceDetail.Exception.ExceptionCallFuncName), color.Red(traceDetail.Exception.ExceptionMessage)))
+			if detail.Exception != nil && detail.Exception.ExceptionIsException {
+				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.ExceptionCallFile, color.Blue(detail.Exception.ExceptionCallLine), color.Red(detail.Exception.ExceptionCallFuncName), color.Red(detail.Exception.ExceptionMessage)))
 			}
 		})
 
