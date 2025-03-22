@@ -11,7 +11,6 @@ import (
 	"github.com/farseer-go/fs/color"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/core"
-	"github.com/farseer-go/fs/exception"
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/snc"
 	"github.com/farseer-go/fs/trace"
@@ -52,7 +51,7 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	})
 	if lstTraceContext.Count() > 0 {
 		if err := uploadTrace(lstTraceContext); err != nil {
-			exception.ThrowRefuseException(err.Error())
+			flog.Warning(err.Error())
 		}
 	}
 }
