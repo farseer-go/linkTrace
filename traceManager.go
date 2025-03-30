@@ -24,9 +24,8 @@ type traceManager struct {
 
 // EntryWebApi Webapi入口
 func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestIp string) *trace.TraceContext {
-	headerDictionary := collections.NewDictionaryFromMap(header)
-	traceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
-	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
+	traceId := parse.ToString(header["Trace-Id"])
+	traceLevel := parse.ToInt(header["Trace-Level"])
 	if traceId == "" {
 		traceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
 	} else {
@@ -36,19 +35,19 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
-		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
+		ParentAppName: header["Trace-App-Name"],
 		TraceId:       traceId,
 		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebApi,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		WebContext: trace.WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
 			WebMethod:      method,
 			WebContentType: contentType,
-			WebHeaders:     headerDictionary.ToDictionary(),
+			WebHeaders:     header,
 			WebRequestBody: "",
 			WebRequestIp:   requestIp,
 		},
@@ -60,11 +59,10 @@ func (*traceManager) EntryWebApi(domain string, path string, method string, cont
 
 // EntryWebSocket WebSocket入口
 func (*traceManager) EntryWebSocket(domain string, path string, header map[string]string, requestIp string) *trace.TraceContext {
-	headerDictionary := collections.NewDictionaryFromMap(header)
-	parentTraceId := parse.ToString(headerDictionary.GetValue("Trace-Id"))
-	traceLevel := parse.ToInt(headerDictionary.GetValue("Trace-Level"))
-	if parentTraceId == "" {
-		parentTraceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
+	traceId := parse.ToString(header["Trace-Id"])
+	traceLevel := parse.ToInt(header["Trace-Level"])
+	if traceId == "" {
+		traceId = strconv.FormatInt(sonyflake.GenerateId(), 10)
 	} else {
 		traceLevel++ // 来自上游的请求，自动+1层
 	}
@@ -72,19 +70,19 @@ func (*traceManager) EntryWebSocket(domain string, path string, header map[strin
 		AppId:         strconv.FormatInt(core.AppId, 10),
 		AppName:       core.AppName,
 		AppIp:         core.AppIp,
-		ParentAppName: headerDictionary.GetValue("Trace-App-Name"),
-		TraceId:       parentTraceId,
+		ParentAppName: header["Trace-App-Name"],
+		TraceId:       traceId,
 		TraceLevel:    traceLevel,
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WebSocket,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		WebContext: trace.WebContext{
 			WebDomain:      domain,
 			WebPath:        path,
 			WebMethod:      "WEBSOCKET",
 			WebContentType: "",
-			WebHeaders:     headerDictionary.ToDictionary(),
+			WebHeaders:     header,
 			WebRequestBody: "Conn",
 			WebRequestIp:   requestIp,
 		},
@@ -113,7 +111,7 @@ func (*traceManager) EntryMqConsumer(parentTraceId, parentAppName, server string
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.MqConsumer,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:     server,
 			ConsumerQueueName:  queueName,
@@ -136,7 +134,7 @@ func (*traceManager) EntryQueueConsumer(queueName, subscribeName string) *trace.
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.QueueConsumer,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:    fmt.Sprintf("本地Queue/%s/%s/%v", core.AppName, core.AppIp, core.AppId),
 			ConsumerQueueName: queueName + "/" + subscribeName,
@@ -170,7 +168,7 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 		TraceType:     eumTraceType.EventConsumer,
 		TraceLevel:    traceLevel,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		ConsumerContext: trace.ConsumerContext{
 			ConsumerServer:    server,
 			ConsumerQueueName: eventName + "/" + subscribeName,
@@ -193,7 +191,7 @@ func (*traceManager) EntryTask(taskName string) *trace.TraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		TaskContext: trace.TaskContext{
 			TaskName: taskName,
 		},
@@ -215,7 +213,7 @@ func (*traceManager) EntryTaskGroup(taskName string, taskGroupName string, taskI
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.Task,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		TaskContext: trace.TaskContext{
 			TaskName:      fmt.Sprintf("%s，任务组=%s，任务ID=%v", taskName, taskGroupName, taskId),
 			TaskGroupName: taskGroupName,
@@ -239,12 +237,12 @@ func (*traceManager) EntryFSchedule(taskGroupName string, taskId int64, data map
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.FSchedule,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		TaskContext: trace.TaskContext{
 			TaskName:      taskGroupName,
 			TaskGroupName: taskGroupName,
 			TaskId:        taskId,
-			TaskData:      collections.NewDictionaryFromMap(data),
+			TaskData:      data,
 		},
 	}
 	trace.CurTraceContext.Set(context)
@@ -264,7 +262,7 @@ func (*traceManager) EntryWatchKey(key string) *trace.TraceContext {
 		StartTs:       time.Now().UnixMicro(),
 		TraceType:     eumTraceType.WatchKey,
 		CreateAt:      dateTime.Now(),
-		List:          collections.NewList[*trace.TraceDetail](),
+		List:          make([]*trace.TraceDetail, 0),
 		WatchKeyContext: trace.WatchKeyContext{
 			WatchKey: key,
 		},
@@ -384,23 +382,27 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	traceContext.UseDesc = traceContext.UseTs.String()
 
 	// 移除忽略的明细
-	traceContext.List.RemoveAll(func(traceDetail *trace.TraceDetail) bool {
-		return traceDetail.IsIgnore()
-	})
+	var lstTraceDetail []*trace.TraceDetail
+	for _, traceDetail := range traceContext.List {
+		if !traceDetail.IsIgnore() {
+			lstTraceDetail = append(lstTraceDetail, traceDetail)
+		}
+	}
+	traceContext.List = lstTraceDetail
 
 	// 找到有异常的明细链路，打印日志，供上传到FOPS
-	traceContext.List.Where(func(item *trace.TraceDetail) bool {
-		return item.Exception != nil
-	}).Foreach(func(traceDetail **trace.TraceDetail) {
-		detail := *traceDetail
-		flog.Errorf("%s %s %s:%d %s", detail.CallType.ToString(), detail.Exception.ExceptionCallFile, detail.Exception.ExceptionCallFuncName, detail.Exception.ExceptionCallLine, detail.Exception.ExceptionMessage)
-	})
+	for _, traceDetail := range traceContext.List {
+		if traceDetail.Exception != nil {
+			detail := *traceDetail
+			flog.Errorf("%s %s %s:%d %s", detail.CallType.ToString(), detail.Exception.ExceptionCallFile, detail.Exception.ExceptionCallFuncName, detail.Exception.ExceptionCallLine, detail.Exception.ExceptionMessage)
+		}
+	}
 
 	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台，供上传到FOPS
 	if traceContext.Exception != nil {
 		flog.Errorf("%s %s %s:%d %s", traceContext.TraceType.ToString(), traceContext.Exception.ExceptionCallFile, traceContext.Exception.ExceptionCallFuncName, traceContext.Exception.ExceptionCallLine, traceContext.Exception.ExceptionMessage)
 	}
-	traceContext.TraceCount = traceContext.List.Count()
+	traceContext.TraceCount = len(traceContext.List)
 
 	// 启用了链路追踪后，把数据写入到本地队列中
 	if defConfig.Enable {
@@ -410,7 +412,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	// 打印日志
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
-		traceContext.List.For(func(i int, traceDetail **trace.TraceDetail) {
+		for i, traceDetail := range traceContext.List {
 			detail := *traceDetail
 			tab := strings.Repeat("\t", detail.Level-1)
 			log := fmt.Sprintf("%s%s (%s)：%s", tab, color.Blue(i+1), color.Green(detail.UnTraceTs.String()), detail.ToString())
@@ -419,7 +421,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			if detail.Exception != nil && detail.Exception.ExceptionIsException {
 				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.ExceptionCallFile, color.Blue(detail.Exception.ExceptionCallLine), color.Red(detail.Exception.ExceptionCallFuncName), color.Red(detail.Exception.ExceptionMessage)))
 			}
-		})
+		}
 
 		if traceContext.Exception != nil && traceContext.Exception.ExceptionIsException {
 			lst.Add(fmt.Sprintf("%s%s:%s %s %s", color.Red("【异常】"), color.Blue(traceContext.Exception.ExceptionCallFile), color.Blue(traceContext.Exception.ExceptionCallLine), color.Green(traceContext.Exception.ExceptionCallFuncName), color.Red(traceContext.Exception.ExceptionMessage)))

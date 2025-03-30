@@ -29,13 +29,13 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	lstMessage.Foreach(func(item *any) {
 		// 上下文
 		dto := (*item).(*trace.TraceContext)
-		if !dto.List.Any() && dto.TraceType != eumTraceType.WebApi {
+		if len(dto.List) == 0 && dto.TraceType != eumTraceType.WebApi {
 			return
 		}
 
 		// 链路超过200条，则丢弃
-		if dto.List.Count() > 200 {
-			dto.List = dto.List.Range(0, 200).ToList()
+		if len(dto.List) > 200 {
+			dto.List = dto.List[0:200]
 			switch dto.TraceType {
 			case eumTraceType.WebApi:
 				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", dto.TraceType.ToString(), color.Green(dto.TraceId), color.Red(dto.UseTs.String()), dto.WebContext.WebPath)
