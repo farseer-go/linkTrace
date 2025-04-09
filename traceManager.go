@@ -1,6 +1,7 @@
 package linkTrace
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
@@ -394,13 +395,62 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	for _, traceDetail := range traceContext.List {
 		if traceDetail.Exception != nil {
 			detail := *traceDetail
-			flog.Errorf("%s %s %s:%d %s", detail.CallType.ToString(), detail.Exception.ExceptionCallFile, detail.Exception.ExceptionCallFuncName, detail.Exception.ExceptionCallLine, detail.Exception.ExceptionMessage)
+			var b bytes.Buffer
+			b.WriteString(detail.CallType.ToString())
+			b.WriteString(" ")
+			b.WriteString(detail.Exception.ExceptionMessage)
+			for index, exceptionStackDetail := range detail.Exception.Details {
+				b.WriteString("\n")
+				b.WriteString(strconv.Itoa(index + 1))
+				b.WriteString("、")
+				b.WriteString(exceptionStackDetail.ExceptionCallFile)
+				b.WriteString(" ")
+				b.WriteString(exceptionStackDetail.ExceptionCallFuncName)
+				b.WriteString(":")
+				b.WriteString(strconv.Itoa(exceptionStackDetail.ExceptionCallLine))
+			}
+			flog.Errorf(b.String())
 		}
 	}
 
 	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台，供上传到FOPS
 	if traceContext.Exception != nil {
-		flog.Errorf("%s %s %s:%d %s", traceContext.TraceType.ToString(), traceContext.Exception.ExceptionCallFile, traceContext.Exception.ExceptionCallFuncName, traceContext.Exception.ExceptionCallLine, traceContext.Exception.ExceptionMessage)
+		switch traceContext.TraceType {
+		case eumTraceType.WebApi, eumTraceType.WebSocket:
+			var b bytes.Buffer
+			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
+				for index, exceptionStackDetail := range traceContext.Exception.Details {
+					b.WriteString("\n")
+					b.WriteString(strconv.Itoa(index + 1))
+					b.WriteString("、")
+					b.WriteString(exceptionStackDetail.ExceptionCallFile)
+					b.WriteString(" ")
+					b.WriteString(color.Red(exceptionStackDetail.ExceptionCallFuncName))
+					b.WriteString(":")
+					b.WriteString(color.Blue(exceptionStackDetail.ExceptionCallLine))
+				}
+			}
+			_ = flog.Errorf("[%s]%s 发生错误：%s%s", traceContext.WebMethod, traceContext.WebPath, color.Red(traceContext.Exception.ExceptionMessage), b.String())
+		default:
+			var b bytes.Buffer
+			b.WriteString(traceContext.TraceType.ToString())
+			b.WriteString(" ")
+			b.WriteString(traceContext.Exception.ExceptionMessage)
+			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
+				for index, exceptionStackDetail := range traceContext.Exception.Details {
+					b.WriteString("\n")
+					b.WriteString(strconv.Itoa(index + 1))
+					b.WriteString("、")
+					b.WriteString(exceptionStackDetail.ExceptionCallFile)
+					b.WriteString(" ")
+					b.WriteString(color.Red(exceptionStackDetail.ExceptionCallFuncName))
+					b.WriteString(":")
+					b.WriteString(color.Blue(exceptionStackDetail.ExceptionCallLine))
+				}
+			}
+			flog.Errorf(b.String())
+		}
+
 	}
 	traceContext.TraceCount = len(traceContext.List)
 
@@ -419,12 +469,18 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			lst.Add(log)
 
 			if detail.Exception != nil && detail.Exception.ExceptionIsException {
-				lst.Add(fmt.Sprintf("%s:%s %s 出错了：%s", detail.Exception.ExceptionCallFile, color.Blue(detail.Exception.ExceptionCallLine), color.Red(detail.Exception.ExceptionCallFuncName), color.Red(detail.Exception.ExceptionMessage)))
+				lst.Add(color.Red("【异常】") + color.Red(detail.Exception.ExceptionMessage))
+				for index, exceptionStackDetail := range detail.Exception.Details {
+					lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Blue(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
+				}
 			}
 		}
 
 		if traceContext.Exception != nil && traceContext.Exception.ExceptionIsException {
-			lst.Add(fmt.Sprintf("%s%s:%s %s %s", color.Red("【异常】"), color.Blue(traceContext.Exception.ExceptionCallFile), color.Blue(traceContext.Exception.ExceptionCallLine), color.Green(traceContext.Exception.ExceptionCallFuncName), color.Red(traceContext.Exception.ExceptionMessage)))
+			lst.Add(color.Red("【异常】") + color.Red(traceContext.Exception.ExceptionMessage))
+			for index, exceptionStackDetail := range traceContext.Exception.Details {
+				lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Blue(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
+			}
 		}
 
 		lst.Add("-----------------------------------------------------------------")
