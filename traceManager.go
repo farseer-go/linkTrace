@@ -399,7 +399,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			b.WriteString(detail.CallType.ToString())
 			b.WriteString(" ")
 			b.WriteString(detail.Exception.ExceptionMessage)
-			for index, exceptionStackDetail := range detail.Exception.Details {
+			for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
 				b.WriteString("\n")
 				b.WriteString(strconv.Itoa(index + 1))
 				b.WriteString("、")
@@ -419,7 +419,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 		case eumTraceType.WebApi, eumTraceType.WebSocket:
 			var b bytes.Buffer
 			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
-				for index, exceptionStackDetail := range traceContext.Exception.Details {
+				for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
 					b.WriteString("\n")
 					b.WriteString(strconv.Itoa(index + 1))
 					b.WriteString("、")
@@ -437,7 +437,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			b.WriteString(" ")
 			b.WriteString(traceContext.Exception.ExceptionMessage)
 			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
-				for index, exceptionStackDetail := range traceContext.Exception.Details {
+				for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
 					b.WriteString("\n")
 					b.WriteString(strconv.Itoa(index + 1))
 					b.WriteString("、")
@@ -470,16 +470,16 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 
 			if detail.Exception != nil && detail.Exception.ExceptionIsException {
 				lst.Add(color.Red("【异常】") + color.Red(detail.Exception.ExceptionMessage))
-				for index, exceptionStackDetail := range detail.Exception.Details {
-					lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Blue(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
+				for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
+					lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Yellow(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
 				}
 			}
 		}
 
 		if traceContext.Exception != nil && traceContext.Exception.ExceptionIsException {
 			lst.Add(color.Red("【异常】") + color.Red(traceContext.Exception.ExceptionMessage))
-			for index, exceptionStackDetail := range traceContext.Exception.Details {
-				lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Blue(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
+			for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
+				lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Yellow(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
 			}
 		}
 
