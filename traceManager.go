@@ -416,6 +416,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台，供上传到FOPS
 	if traceContext.Exception != nil {
 		switch traceContext.TraceType {
+		case eumTraceType.MqConsumer: // 忽略MqConsumer，因为mq的异常会在mq的函数中打印
 		case eumTraceType.WebApi, eumTraceType.WebSocket:
 			var b bytes.Buffer
 			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
@@ -450,7 +451,6 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			}
 			flog.Errorf(b.String())
 		}
-
 	}
 	traceContext.TraceCount = len(traceContext.List)
 
