@@ -391,28 +391,6 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	}
 	traceContext.List = lstTraceDetail
 
-	// 找到有异常的明细链路，打印日志，供上传到FOPS
-	for _, traceDetail := range traceContext.List {
-		if traceDetail.Exception != nil {
-			detail := *traceDetail
-			var b bytes.Buffer
-			b.WriteString(detail.CallType.ToString())
-			b.WriteString(" ")
-			b.WriteString(detail.Exception.ExceptionMessage)
-			for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
-				b.WriteString("\n")
-				b.WriteString(strconv.Itoa(index + 1))
-				b.WriteString("、")
-				b.WriteString(exceptionStackDetail.ExceptionCallFile)
-				b.WriteString(" ")
-				b.WriteString(exceptionStackDetail.ExceptionCallFuncName)
-				b.WriteString(":")
-				b.WriteString(strconv.Itoa(exceptionStackDetail.ExceptionCallLine))
-			}
-			flog.Errorf(b.String())
-		}
-	}
-
 	// 判断是否有异常,如果有异常，就要把异常信息打印到控制台，供上传到FOPS
 	if traceContext.Exception != nil {
 		switch traceContext.TraceType {
@@ -451,6 +429,34 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			flog.Errorf(b.String())
 		}
 	}
+
+	// 找到有异常的明细链路，打印日志，供上传到FOPS
+	for _, traceDetail := range traceContext.List {
+		if traceDetail.Exception != nil {
+			detail := *traceDetail
+			var b bytes.Buffer
+			b.WriteString(detail.CallType.ToString())
+			b.WriteString(" ")
+			b.WriteString(detail.Exception.ExceptionMessage)
+			for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
+				b.WriteString("\n")
+				b.WriteString(strconv.Itoa(index + 1))
+				b.WriteString("、")
+				b.WriteString(exceptionStackDetail.ExceptionCallFile)
+				b.WriteString(" ")
+				b.WriteString(exceptionStackDetail.ExceptionCallFuncName)
+				b.WriteString(":")
+				b.WriteString(strconv.Itoa(exceptionStackDetail.ExceptionCallLine))
+			}
+			flog.Errorf(b.String())
+
+			// 如果明细有异常，而上下文没有异常，则把明细的异常赋值给上下文
+			if traceContext.Exception == nil {
+				traceContext.Exception = traceDetail.Exception
+			}
+		}
+	}
+
 	traceContext.TraceCount = len(traceContext.List)
 
 	// 启用了链路追踪后，把数据写入到本地队列中
@@ -461,6 +467,13 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	// 打印日志
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
+		if traceContext.Exception != nil && traceContext.Exception.ExceptionIsException {
+			lst.Add(color.Red("【异常】") + color.Red(traceContext.Exception.ExceptionMessage))
+			for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
+				lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Yellow(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
+			}
+		}
+
 		for i, traceDetail := range traceContext.List {
 			detail := *traceDetail
 			tab := strings.Repeat("\t", detail.Level-1)
@@ -472,13 +485,6 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 				for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
 					lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Yellow(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
 				}
-			}
-		}
-
-		if traceContext.Exception != nil && traceContext.Exception.ExceptionIsException {
-			lst.Add(color.Red("【异常】") + color.Red(traceContext.Exception.ExceptionMessage))
-			for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
-				lst.Add(fmt.Sprintf("\t%d、%s:%s %s", index+1, exceptionStackDetail.ExceptionCallFile, color.Yellow(exceptionStackDetail.ExceptionCallLine), color.Red(exceptionStackDetail.ExceptionCallFuncName)))
 			}
 		}
 
