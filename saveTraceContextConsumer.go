@@ -51,7 +51,7 @@ func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListA
 	})
 	if lstTraceContext.Count() > 0 {
 		if err := uploadTrace(lstTraceContext); err != nil {
-			flog.Warning(err.Error())
+			flog.Debug(err.Error())
 		}
 	}
 }
