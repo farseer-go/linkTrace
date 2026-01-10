@@ -23,6 +23,19 @@ import (
 type traceManager struct {
 }
 
+// 取消链路
+func (receiver *traceManager) GetTraceContext() (*trace.TraceContext, bool) {
+	traceContext := trace.CurTraceContext.Get()
+	return traceContext, traceContext != nil
+}
+
+// 取消链路
+func (receiver *traceManager) Ignore() {
+	if traceContext, exists := receiver.GetTraceContext(); exists {
+		traceContext.Ignore()
+	}
+}
+
 // EntryWebApi Webapi入口
 func (*traceManager) EntryWebApi(domain string, path string, method string, contentType string, header map[string]string, requestIp string) *trace.TraceContext {
 	traceId := parse.ToString(header["Trace-Id"])
@@ -152,7 +165,7 @@ func (receiver *traceManager) EntryEventConsumer(server, eventName, subscribeNam
 	var traceId string
 	var traceLevel int
 	var parentAppName string
-	if cur := trace.CurTraceContext.Get(); cur != nil {
+	if cur, exists := receiver.GetTraceContext(); exists {
 		traceId, parentAppName, _, _, _ = cur.GetAppInfo()
 		traceLevel = cur.TraceLevel + 1
 	} else {

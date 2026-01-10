@@ -10,6 +10,7 @@ import (
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/color"
 	"github.com/farseer-go/fs/configure"
+	"github.com/farseer-go/fs/container"
 	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/flog"
 	"github.com/farseer-go/fs/snc"
@@ -22,9 +23,9 @@ var FopsServer string
 
 // SaveTraceContextConsumer 上传链路记录到FOPS中心
 func SaveTraceContextConsumer(subscribeName string, lstMessage collections.ListAny, remainingCount int) {
-	if traceContext := trace.CurTraceContext.Get(); traceContext != nil {
-		traceContext.Ignore()
-	}
+	// 取消链路
+	container.Resolve[trace.IManager]().Ignore()
+
 	lstTraceContext := collections.NewList[*trace.TraceContext]()
 	lstMessage.Foreach(func(item *any) {
 		// 上下文
@@ -68,7 +69,7 @@ func uploadTrace(lstTraceContext collections.List[*trace.TraceContext]) error {
 	newRequest.Header.Set("Content-Type", "application/json")
 
 	// 链路追踪
-	if traceContext := trace.CurTraceContext.Get(); traceContext != nil {
+	if traceContext, exists := container.Resolve[trace.IManager]().GetTraceContext(); exists {
 		newRequest.Header.Set("Trace-Id", traceContext.TraceId)
 		newRequest.Header.Set("Trace-Level", strconv.Itoa(traceContext.TraceLevel))
 		newRequest.Header.Set("Trace-App-Name", core.AppName)
