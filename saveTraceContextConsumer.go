@@ -62,7 +62,7 @@ type UploadTraceRequest struct {
 	List collections.List[*trace.TraceContext]
 }
 
-// 1. 定义一个全局复用的 Client（只需要初始化一次）
+// 定义一个全局复用的 Client（只需要初始化一次）
 var traceHttpClient = &http.Client{
 	Timeout: 10 * time.Second, // 必须设置总超时
 	Transport: &http.Transport{
