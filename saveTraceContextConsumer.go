@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/farseer-go/collections"
 	"github.com/farseer-go/fs/color"
@@ -61,6 +62,16 @@ type UploadTraceRequest struct {
 	List collections.List[*trace.TraceContext]
 }
 
+// 1. 定义一个全局复用的 Client（只需要初始化一次）
+var traceHttpClient = &http.Client{
+	Timeout: 10 * time.Second, // 必须设置总超时
+	Transport: &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, // 不验证 HTTPS 证书
+		MaxIdleConns:    100,
+		IdleConnTimeout: 90 * time.Second,
+	},
+}
+
 // UploadTrace 上传链路记录
 func uploadTrace(lstTraceContext collections.List[*trace.TraceContext]) error {
 	bodyByte, _ := snc.Marshal(UploadTraceRequest{List: lstTraceContext})
@@ -74,17 +85,15 @@ func uploadTrace(lstTraceContext collections.List[*trace.TraceContext]) error {
 		newRequest.Header.Set("Trace-Level", strconv.Itoa(traceContext.TraceLevel))
 		newRequest.Header.Set("Trace-App-Name", core.AppName)
 	}
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: true, // 不验证 HTTPS 证书
-			},
-		},
-	}
-	rsp, err := client.Do(newRequest)
+
+	rsp, err := traceHttpClient.Do(newRequest)
 	if err != nil {
 		return fmt.Errorf("上传链路记录到FOPS失败：%s", err.Error())
 	}
+
+	// 3. 关键点：使用 defer 确保 Body 最终被关闭
+	// 即使后面的业务逻辑报错，连接也会回到池中
+	defer rsp.Body.Close()
 
 	apiRsp := core.NewApiResponseByReader[any](rsp.Body)
 	if apiRsp.StatusCode != 200 {
