@@ -17,7 +17,6 @@ import (
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/fs/trace/eumCallType"
 	"github.com/farseer-go/fs/trace/eumTraceType"
-	"github.com/farseer-go/queue"
 )
 
 type traceManager struct {
@@ -472,11 +471,6 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 
 	traceContext.TraceCount = len(traceContext.List)
 
-	// 启用了链路追踪后，把数据写入到本地队列中
-	if defConfig.Enable {
-		queue.Push("TraceContext", traceContext)
-	}
-
 	// 打印日志
 	if defConfig.PrintLog {
 		lst := collections.NewList[string]()
@@ -513,5 +507,28 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 		default:
 			flog.Printf("【%s链路追踪】TraceId:%s，耗时：%s\n%s\n", traceContext.TraceType.ToString(), color.Green(traceContext.TraceId), color.Red(traceContext.UseTs.String()), logs)
 		}
+	}
+
+	// 启用了链路追踪后，把数据写入到本地队列中
+	if defConfig.Enable {
+		if len(traceContext.List) == 0 && traceContext.TraceType != eumTraceType.WebApi {
+			return
+		}
+
+		// 链路超过200条，则丢弃
+		if len(traceContext.List) > 200 {
+			traceContext.List = traceContext.List[0:200]
+			switch traceContext.TraceType {
+			case eumTraceType.WebApi:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", traceContext.TraceType.ToString(), color.Green(traceContext.TraceId), color.Red(traceContext.UseTs.String()), traceContext.WebContext.WebPath)
+			case eumTraceType.MqConsumer, eumTraceType.QueueConsumer, eumTraceType.EventConsumer:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s", traceContext.TraceType.ToString(), color.Green(traceContext.TraceId), color.Red(traceContext.UseTs.String()), traceContext.ConsumerContext.ConsumerQueueName)
+			case eumTraceType.Task, eumTraceType.FSchedule:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s，%s %s", traceContext.TraceType.ToString(), color.Green(traceContext.TraceId), color.Red(traceContext.UseTs.String()), traceContext.TaskContext.TaskName, traceContext.TaskContext.TaskGroupName)
+			default:
+				flog.Warningf("【%s链路追踪】链路明细超过200条，TraceId:%s，耗时：%s", traceContext.TraceType.ToString(), color.Green(traceContext.TraceId), color.Red(traceContext.UseTs.String()))
+			}
+		}
+		writer.Write(traceContext)
 	}
 }

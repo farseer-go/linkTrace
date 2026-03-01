@@ -1,11 +1,12 @@
 package linkTrace
 
 import (
-	"strings"
 	"time"
 
+	"github.com/farseer-go/fs/batchFileWriter"
 	"github.com/farseer-go/fs/configure"
 	"github.com/farseer-go/fs/container"
+	"github.com/farseer-go/fs/core"
 	"github.com/farseer-go/fs/modules"
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/queue"
@@ -13,6 +14,9 @@ import (
 
 // Enable 是否启用
 var defConfig config
+
+// 链路数据写入器
+var writer *batchFileWriter.BatchFileWriter
 
 type Module struct {
 }
@@ -32,13 +36,14 @@ func (module Module) PreInitialize() {
 
 	// 启用了链路追踪后，才需要初始化ES和消费
 	if defConfig.Enable {
-		FopsServer = strings.ToLower(configure.GetString("Fops.Server"))
-		if !strings.HasPrefix(FopsServer, "http") {
-			panic("[farseer.yaml]Fops.Server配置不正确，示例：https://fops.fsgit.com")
-		}
-		if !strings.HasSuffix(FopsServer, "/") {
-			FopsServer += "/"
-		}
-		queue.Subscribe("TraceContext", "SaveTraceContext", 1000, 5*time.Second, SaveTraceContextConsumer)
+		// 初始化链路数据写入器
+		writer = batchFileWriter.NewWriter("/var/log/linkTrace/"+core.AppName+"/", "trace", "hour", 10, 0, time.Second*5, true)
+	}
+}
+
+func (module Module) Shutdown() {
+	// 关闭链路数据写入器
+	if defConfig.Enable {
+		writer.Close()
 	}
 }
