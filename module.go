@@ -1,6 +1,7 @@
 package linkTrace
 
 import (
+	"os"
 	"time"
 
 	"github.com/farseer-go/fs/batchFileWriter"
@@ -11,6 +12,15 @@ import (
 	"github.com/farseer-go/fs/trace"
 	"github.com/farseer-go/queue"
 )
+
+// getLogBasePath 获取日志基础路径
+// 如果 /var/ 目录存在，返回 /var/log/linkTrace/，否则返回 ./linkTrace/
+func getlinkTraceBasePath() string {
+	if _, err := os.Stat("/var/"); err == nil {
+		return "/var/log/linkTrace/"
+	}
+	return "./linkTrace/"
+}
 
 // Enable 是否启用
 var defConfig config
@@ -37,7 +47,7 @@ func (module Module) PreInitialize() {
 	// 启用了链路追踪后，才需要初始化ES和消费
 	if defConfig.Enable {
 		// 初始化链路数据写入器
-		writer = batchFileWriter.NewWriter("/var/log/linkTrace/"+core.AppName+"/", "trace", "hour", 10, 0, time.Second*5, true)
+		writer = batchFileWriter.NewWriter(getlinkTraceBasePath()+core.AppName+"/", "trace", "hour", 10, 0, time.Second*5, true)
 	}
 }
 
