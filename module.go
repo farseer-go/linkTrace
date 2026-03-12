@@ -1,7 +1,7 @@
 package linkTrace
 
 import (
-	"os"
+	"runtime"
 	"time"
 
 	"github.com/farseer-go/fs/batchFileWriter"
@@ -16,7 +16,7 @@ import (
 // getLogBasePath 获取日志基础路径
 // 如果 /var/ 目录存在，返回 /var/log/linkTrace/，否则返回 ./linkTrace/
 func getlinkTraceBasePath() string {
-	if _, err := os.Stat("/var/"); err == nil {
+	if runtime.GOOS == "linux" {
 		return "/var/log/linkTrace/"
 	}
 	return "./linkTrace/"
