@@ -446,22 +446,26 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 	for _, traceDetail := range traceContext.List {
 		if traceDetail.Exception != nil {
 			detail := *traceDetail
-			var b bytes.Buffer
-			b.WriteString(detail.CallType.ToString())
-			b.WriteString(" ")
-			b.WriteString(detail.Exception.ExceptionMessage)
-			for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
-				b.WriteString("\n")
-				b.WriteString(strconv.Itoa(index + 1))
-				b.WriteString("、")
-				b.WriteString(exceptionStackDetail.ExceptionCallFile)
-				b.WriteString(" ")
-				b.WriteString(exceptionStackDetail.ExceptionCallFuncName)
-				b.WriteString(":")
-				b.WriteString(strconv.Itoa(exceptionStackDetail.ExceptionCallLine))
-			}
-			flog.Errorf(b.String())
 
+			// 网络请求, 非致命异常, 由应用打印
+			if traceDetail.CallType != eumCallType.Http && traceDetail.CallType != eumCallType.Grpc {
+				var b bytes.Buffer
+				b.WriteString(detail.CallType.ToString())
+				b.WriteString(" ")
+				b.WriteString(detail.Exception.ExceptionMessage)
+				for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
+					b.WriteString("\n")
+					b.WriteString(strconv.Itoa(index + 1))
+					b.WriteString("、")
+					b.WriteString(exceptionStackDetail.ExceptionCallFile)
+					b.WriteString(" ")
+					b.WriteString(exceptionStackDetail.ExceptionCallFuncName)
+					b.WriteString(":")
+					b.WriteString(strconv.Itoa(exceptionStackDetail.ExceptionCallLine))
+				}
+				flog.Error(b.String())
+
+			}
 			// 如果明细有异常，而上下文没有异常，则把明细的异常赋值给上下文
 			if traceContext.Exception == nil {
 				traceContext.Exception = traceDetail.Exception
