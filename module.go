@@ -47,7 +47,7 @@ func (module Module) PreInitialize() {
 	// 启用了链路追踪后，才需要初始化ES和消费
 	if defConfig.Enable {
 		// 初始化链路数据写入器
-		writer = batchFileWriter.NewWriter(getlinkTraceBasePath()+core.AppName+"/", "trace", "hour", 10, 0, time.Second*5, true, batchFileWriter.SerializeProtobuf)
+		writer = batchFileWriter.NewWriter(getlinkTraceBasePath()+core.AppName+"/", "trace", "hour", 10, 0, time.Second*5, true, batchFileWriter.SerializeMessagePack)
 	}
 }
 
