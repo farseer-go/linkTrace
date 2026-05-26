@@ -441,11 +441,9 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 					b.WriteString(color.Blue(exceptionStackDetail.ExceptionCallLine))
 				}
 			}
-			_ = flog.Errorf("[%s]%s 发生错误：%s%s", traceContext.WebMethod, traceContext.WebPath, color.Red(traceContext.Exception.ExceptionMessage), b.String())
+			_ = flog.Errorf("[%s]%s 发生错误%s：%s%s", traceContext.WebMethod, traceContext.WebPath, traceContext.TraceId, color.Red(traceContext.Exception.ExceptionMessage), b.String())
 		default:
 			var b bytes.Buffer
-			b.WriteString(traceContext.TraceType.ToString())
-			b.WriteString(" ")
 			b.WriteString(traceContext.Exception.ExceptionMessage)
 			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
 				for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
@@ -459,7 +457,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 					b.WriteString(color.Blue(exceptionStackDetail.ExceptionCallLine))
 				}
 			}
-			flog.Errorf(b.String())
+			_ = flog.Errorf("[%s] 发生错误%s：%s%s", traceContext.TraceType.ToString(), traceContext.TraceId, color.Red(traceContext.Exception.ExceptionMessage), b.String())
 		}
 	}
 
