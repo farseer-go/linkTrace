@@ -443,11 +443,10 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			}
 			_ = flog.Errorf("[%s]%s 发生错误%s：%s%s", traceContext.WebMethod, traceContext.WebPath, traceContext.TraceId, color.Red(traceContext.Exception.ExceptionMessage), b.String())
 		default:
-			var b bytes.Buffer
-			b.WriteString(traceContext.Exception.ExceptionMessage)
 			if !defConfig.PrintLog { // 未开启打印链路日志时，才需要打印。否则会重复打印
+				var b bytes.Buffer
+				b.WriteString(traceContext.Exception.ExceptionMessage)
 				for index, exceptionStackDetail := range traceContext.Exception.ExceptionDetails {
-					b.WriteString("\n")
 					b.WriteString(strconv.Itoa(index + 1))
 					b.WriteString("、")
 					b.WriteString(exceptionStackDetail.ExceptionCallFile)
@@ -455,9 +454,12 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 					b.WriteString(color.Red(exceptionStackDetail.ExceptionCallFuncName))
 					b.WriteString(":")
 					b.WriteString(color.Blue(exceptionStackDetail.ExceptionCallLine))
+					if index+1 < len(traceContext.Exception.ExceptionDetails) {
+						b.WriteString("\n")
+					}
 				}
+				_ = flog.Errorf("[%s] 发生错误%s：%s%s", traceContext.TraceType.ToString(), traceContext.TraceId, color.Red(traceContext.Exception.ExceptionMessage), b.String())
 			}
-			_ = flog.Errorf("[%s] 发生错误%s：%s%s", traceContext.TraceType.ToString(), traceContext.TraceId, color.Red(traceContext.Exception.ExceptionMessage), b.String())
 		}
 	}
 
@@ -469,11 +471,7 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 			// 网络请求, 非致命异常, 由应用打印
 			if traceDetail.CallType != eumCallType.Http && traceDetail.CallType != eumCallType.Grpc {
 				var b bytes.Buffer
-				b.WriteString(detail.CallType.ToString())
-				b.WriteString(" ")
-				b.WriteString(detail.Exception.ExceptionMessage)
 				for index, exceptionStackDetail := range detail.Exception.ExceptionDetails {
-					b.WriteString("\n")
 					b.WriteString(strconv.Itoa(index + 1))
 					b.WriteString("、")
 					b.WriteString(exceptionStackDetail.ExceptionCallFile)
@@ -481,8 +479,11 @@ func (receiver *traceManager) Push(traceContext *trace.TraceContext, err error) 
 					b.WriteString(exceptionStackDetail.ExceptionCallFuncName)
 					b.WriteString(":")
 					b.WriteString(strconv.Itoa(exceptionStackDetail.ExceptionCallLine))
+					if index+1 < len(detail.Exception.ExceptionDetails) {
+						b.WriteString("\n")
+					}
 				}
-				flog.Error(b.String())
+				_ = flog.Errorf("[%s] 发生错误%s：%s%s", detail.CallType.ToString(), traceContext.TraceId, color.Red(detail.Exception.ExceptionMessage), b.String())
 
 			}
 			// 如果明细有异常，而上下文没有异常，则把明细的异常赋值给上下文
