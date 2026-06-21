@@ -40,9 +40,12 @@ func (module Module) PreInitialize() {
 
 	// 使用了链路追踪组件，则要把空组件移除后，重新注册
 	container.Remove[trace.IManager]()
+	mgr := &traceManager{}
 	container.Register(func() trace.IManager {
-		return &traceManager{}
+		return mgr
 	})
+	// 缓存单例，供热路径直接复用（覆盖之前的空实现）
+	trace.SetManager(mgr)
 
 	// 启用了链路追踪后，才需要初始化ES和消费
 	if defConfig.Enable {
